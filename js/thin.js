@@ -12,23 +12,31 @@
 		return this;
 	};
 
+	/**
+	 * 获取函数的形参列表
+	 * @param fn 待分析的函数
+	 * @returns {Array} 形参列表
+	 */
 	function annotate(fn) {
-		var $inject = [];
-		var fnText = fn.toString().replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, "");
-		var argDeclaration = fnText.match(/^function\s*[^\(]*\(\s*([^\)]*)\)/m);
+		var parameters = [];
 
-		var arr = argDeclaration[1].split(",");
-		for(var i=0; i<arr.length; i++) {
-			arr[i].replace(/^\s*(_?)(\S+?)\1\s*$/, function(all, underscore, name){
-				$inject.push(name);
-			});
+		if (fn.length > 0) {
+			var fnText = fn.toString().replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, "");		//去除注释
+			var argDeclaration = fnText.match(/^function\s*[^\(]*\(\s*([^\)]*)\)/m);
+
+			var arr = argDeclaration[1].split(",");
+			for(var i=0; i<arr.length; i++) {
+				arr[i].replace(/^\s*(_?)(\S+?)\1\s*$/, function(all, underscore, name){
+					parameters.push(name);
+				});
+			}
 		}
-		return $inject;
+		return parameters;
 	}
 
 	/**
 	 * Module constructor
-	 * @param name
+	 * @param name Module name
 	 * @param dependencies
 	 * @param constructor
 	 * @constructor
@@ -37,7 +45,6 @@
 		this.name = name;
 		this.dependencies = dependencies;
 		this.factory = factory;
-		this.loaded = false;
 	}
 
 	Module.prototype = {
@@ -76,18 +83,16 @@
 
 	thin.extend({
 		module: function (name, dependencies, constructor) {
-			if (modules[name]) {
-				var error = new Error();
+			if (!modules[name]) {
+				var module = new Module(name, dependencies, constructor);
+
+				modules[name] = module;
 			}
 
-			var module = new Module(name, dependencies, constructor);
+			return module;
+		},
 
-			modules[name] = module;
-
-			var dependModules = [];
-			for (var i=0; i<dependencies.length; i++) {
-				dependModules.push(modules[dependencies[i]]);
-			}
+		constant: function(key, value) {
 
 		},
 
@@ -111,8 +116,15 @@
 	window.thin = thin;
 })(document);
 
-thin.module("EventDispatcher", [], function() {
+thin.module("AJAX", [], function() {
 
+});
+
+thin.module("ModuleLoader", [], function() {
+
+});
+
+thin.module("EventDispatcher", [], function() {
 	//事件派发机制的实现
 	var EventDispatcher = {
 		addEventListener: function (eventType, handler) {
@@ -258,7 +270,6 @@ thin.module("DataGrid", ["EventDispatcher"], function(EventDispatcher) {
 			this.dispatchEvent(event);
 		}
 	}.extend(EventDispatcher);
-
 
 	function DataRow(data, grid) {
 		this.data = data;
