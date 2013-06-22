@@ -64,9 +64,28 @@
 	</div>
 </div>
 
-
 <script type="text/javascript" src="js/thin.js"></script>
+<script type="text/javascript" src="js/modules/controls/datagrid.js"></script>
 <script type="text/javascript">
+	thin.module("A", [], function() {
+		return "a";
+	});
+
+	thin.module("B", [], function() {
+		return "b";
+	});
+
+	thin.module("C", [], function() {
+		return "c";
+	});
+
+	thin.module("D", ["A", "B", "C"], function(B, A, C) {
+		return B + A + C;
+	});
+
+	var D = thin.get("D");
+	alert(D);
+
 	var DataGrid = thin.get("DataGrid");
 	var state = "View";
 

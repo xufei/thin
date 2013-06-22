@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Thin framework demo</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Thin demo v0.1">
+	<meta name="author" content="xu.fei@outlook.com">
+</head>
+<body>
+
+<script type="text/javascript" src="../js/version/thin.0.1.js"></script>
+<script type="text/javascript">
+	thin.module("constant.PI", [], function() {
+		return 3.14159;
+	});
+
+	thin.module("shape.Circle", ["constant.PI"], function(pi) {
+		var Circle = function(r) {
+			this.r = r;
+		};
+
+		Circle.prototype = {
+			area : function() {
+				return pi * this.r * this.r;
+			}
+		}
+
+		return Circle;
+	});
+
+	thin.module("shape.Rectangle", [], function() {
+		var Rectangle = function(l, w) {
+			this.l = l;
+			this.w = w;
+		};
+
+		Rectangle.prototype = {
+			area: function() {
+				return this.l * this.w;
+			}
+		};
+
+		return Rectangle;
+	});
+
+	thin.module("ShapeTypes", ["shape.Circle", "shape.Rectangle"], function(Circle, Rectangle) {
+		return {
+			CIRCLE: Circle,
+			RECTANGLE: Rectangle
+		};
+	});
+
+	thin.module("ShapeFactory", ["ShapeTypes"], function(ShapeTypes) {
+		return {
+			getShape: function(type) {
+				var shape;
+
+				switch (type) {
+					case "CIRCLE": {
+						shape = new ShapeTypes[type](arguments[1]);
+						break;
+					}
+					case "RECTANGLE":  {
+						shape = new ShapeTypes[type](arguments[1], arguments[2]);
+						break;
+					}
+				}
+
+				return shape;
+			}
+		};
+	});
+
+	var ShapeFactory = thin.get("ShapeFactory");
+	alert(ShapeFactory.getShape("CIRCLE", 5).area());
+	alert(ShapeFactory.getShape("RECTANGLE", 3, 4).area());
+</script>
+</body>
+</html>
