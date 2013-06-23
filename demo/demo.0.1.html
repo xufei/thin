@@ -11,11 +11,11 @@
 
 <script type="text/javascript" src="../js/version/thin.0.1.js"></script>
 <script type="text/javascript">
-	thin.module("constant.PI", [], function() {
+	thin.define("constant.PI", [], function() {
 		return 3.14159;
 	});
 
-	thin.module("shape.Circle", ["constant.PI"], function(pi) {
+	thin.define("shape.Circle", ["constant.PI"], function(pi) {
 		var Circle = function(r) {
 			this.r = r;
 		};
@@ -29,7 +29,7 @@
 		return Circle;
 	});
 
-	thin.module("shape.Rectangle", [], function() {
+	thin.define("shape.Rectangle", [], function() {
 		var Rectangle = function(l, w) {
 			this.l = l;
 			this.w = w;
@@ -44,14 +44,14 @@
 		return Rectangle;
 	});
 
-	thin.module("ShapeTypes", ["shape.Circle", "shape.Rectangle"], function(Circle, Rectangle) {
+	thin.define("ShapeTypes", ["shape.Circle", "shape.Rectangle"], function(Circle, Rectangle) {
 		return {
 			CIRCLE: Circle,
 			RECTANGLE: Rectangle
 		};
 	});
 
-	thin.module("ShapeFactory", ["ShapeTypes"], function(ShapeTypes) {
+	thin.define("ShapeFactory", ["ShapeTypes"], function(ShapeTypes) {
 		return {
 			getShape: function(type) {
 				var shape;
@@ -72,7 +72,7 @@
 		};
 	});
 
-	var ShapeFactory = thin.get("ShapeFactory");
+	var ShapeFactory = thin.use("ShapeFactory");
 	alert(ShapeFactory.getShape("CIRCLE", 5).area());
 	alert(ShapeFactory.getShape("RECTANGLE", 3, 4).area());
 </script>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Chinese Chess</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Chinese Chess">
+	<meta name="author" content="xu.fei@outlook.com">
+	<script type="text/javascript" src="../js/thin.js"></script>
+	<script type="text/javascript" src="../libs/raphael-min.js"></script>
+	<script type="text/javascript" src="../js/modules/chess/chess.js"></script>
+</head>
+<body>
+	<div id="chessContainer">
+
+	</div>
+
+	<script type="text/javascript">
+		var chessController = thin.use("ChessController");
+		chessController.init(document.getElementById("chessContainer"));
+	</script>
+</body>
+</html>

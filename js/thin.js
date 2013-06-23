@@ -1,6 +1,5 @@
 (function (doc) {
 	var moduleMap = {};
-	var moduleInstances = {};
 
 	//简单的对象属性复制，把源对象上的属性复制到自己身上，只复制一层
 	Object.prototype.extend = function (base) {
@@ -23,31 +22,38 @@
 	};
 
 	var thin = {
-		module: function(name, dependencies, factory) {
-			moduleMap[name] = {
-				name: name,
-				dependencies: dependencies,
-				factory: factory
+		define: function(name, dependencies, factory) {
+			if (!moduleMap[name]) {
+				var module = {
+					name: name,
+					dependencies: dependencies,
+					factory: factory
+				};
+
+				moduleMap[name] = module;
 			}
+
+			return moduleMap[name];
 		},
 
-		constant: function(key, value) {
-
-		},
-
-		get: function(name) {
+		use: function(name) {
 			var module = moduleMap[name];
 
-			var args = [];
-			for (var i=0; i<module.dependencies.length; i++) {
-				args.push(this.get(module.dependencies[i]));
+			if (!module.entity) {
+				var args = [];
+				for (var i=0; i<module.dependencies.length; i++) {
+					if (moduleMap[module.dependencies[i]].entity) {
+						args.push(moduleMap[module.dependencies[i]].entity);
+					}
+					else {
+						args.push(this.use(module.dependencies[i]));
+					}
+				}
+
+				module.entity = module.factory.apply(noop, args);
 			}
 
-			var instance = module.factory.apply(noop, args);
-			var id = uuid();
-			instance.id = id;
-			moduleInstances[id] = instance;
-			return instance;
+			return module.entity;
 		},
 
 		ready: function() {
@@ -66,15 +72,15 @@
 	window.thin = thin;
 })(document);
 
-thin.module("AJAX", [], function() {
+thin.define("AJAX", [], function() {
 
 });
 
-thin.module("ModuleLoader", [], function() {
+thin.define("ModuleLoader", [], function() {
 
 });
 
-thin.module("EventDispatcher", [], function() {
+thin.define("EventDispatcher", [], function() {
 	//事件派发机制的实现
 	var EventDispatcher = {
 		addEventListener: function (eventType, handler) {
@@ -115,7 +121,7 @@ thin.module("EventDispatcher", [], function() {
 	return EventDispatcher;
 });
 
-thin.module("EventBus", ["EventDispatcher"], function(EventDispatcher) {
+thin.define("EventBus", ["EventDispatcher"], function(EventDispatcher) {
 	var EventBus = {}.extend(EventDispatcher);
 
 	return EventBus;
