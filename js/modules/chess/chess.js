@@ -11,7 +11,7 @@ thin.define("ChessType", [], function () {
 	};
 });
 
-thin.define("ChessText", [], function() {
+thin.define("ChessText", [], function () {
 	return {
 		14: "帅",
 		13: "仕",
@@ -54,7 +54,7 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 	var blankArr = [];
 	var attackArr = [];
 	var chesses = [];
-	for (var i=0; i<9; i++) {
+	for (var i = 0; i < 9; i++) {
 		chesses[i] = [];
 	}
 
@@ -141,9 +141,9 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 			}
 		},
 
-		drawChess: function(chess) {
-			for (var i=0; i<9; i++) {
-				for (var j=0; j<10; j++) {
+		drawChess: function (chess) {
+			for (var i = 0; i < 9; i++) {
+				for (var j = 0; j < 10; j++) {
 					var chess = ChessService.getChess(i, j);
 
 					if (chess) {
@@ -157,7 +157,7 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 							"stroke-width": 3,
 							"fill": "#eeeeee"
 						});
-						
+
 						var label = this.paper.text(x, y, ChessText[chess.type + (chess.color + 1) * 7 / 2]);
 						var color = chess.color == ChessColor.RED ? "red" : "black";
 						label.attr({
@@ -172,8 +172,8 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 							"cursor": "pointer"
 						});
 
-						group.click((function(context) {
-							return function() {
+						group.click((function (context) {
+							return function () {
 								ChessService.chessClicked(context);
 							};
 						})(chess));
@@ -181,14 +181,14 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 						chesses[i][j] = {
 							group: group,
 							bound: bound,
-							label: label	
+							label: label
 						};
 					}
 				}
 			}
 		},
 
-		moveChess: function(oldX, oldY, newX, newY) {
+		moveChess: function (oldX, oldY, newX, newY) {
 			var x = offsetX + gridSize * newX;
 			var y = offsetY + gridSize * newY;
 
@@ -207,7 +207,7 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 			chesses[newX][newY] = chess;
 		},
 
-		attackChess: function(oldX, oldY, newX, newY) {
+		attackChess: function (oldX, oldY, newX, newY) {
 			chesses[newX][newY].label.remove();
 			chesses[newX][newY].group.remove();
 
@@ -228,53 +228,62 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 			chesses[newX][newY] = chess;
 		},
 
-		drawBlank: function(x, y) {
+		drawBlank: function (x, y) {
 			var posX = offsetX + gridSize * x;
 			var posY = offsetY + gridSize * y;
 
-			var rect = this.paper.rect(posX- gridSize / 4, posY - gridSize / 4, gridSize / 2, gridSize / 2);
+			var rect = this.paper.rect(posX - gridSize / 4, posY - gridSize / 4, gridSize / 2, gridSize / 2);
 			rect.attr({
 				"stroke-width": 2,
 				"stroke": "green",
 				"fill": "#eeeeee"
 			});
 
-			rect.click(function() {
+			rect.click(function () {
 				ChessService.blankClicked(x, y);
 			});
 
 			blankArr.push(rect);
 		},
 
-		clearBlank: function() {
-			for (var i=0; i<blankArr.length; i++) {
+		clearBlank: function () {
+			for (var i = 0; i < blankArr.length; i++) {
 				blankArr[i].remove();
 			}
 			blankArr = [];
 		},
 
-		drawAttack: function(x, y) {
+		drawAttack: function (x, y) {
 			var posX = offsetX + gridSize * x;
 			var posY = offsetY + gridSize * y;
 
-			var rect = this.paper.rect(posX- gridSize * 0.45, posY - gridSize * 0.45, gridSize * 0.9, gridSize * 0.9);
+			var rect = this.paper.rect(posX - gridSize * 0.45, posY - gridSize * 0.45, gridSize * 0.9, gridSize * 0.9);
 			rect.attr({
 				"stroke-width": 2,
 				"stroke": "green"
 			});
 
-			rect.click(function() {
+			rect.click(function () {
 				ChessService.blankClicked(x, y);
 			});
 
 			attackArr.push(rect);
 		},
 
-		clearAttack: function() {
-			for (var i=0; i<attackArr.length; i++) {
+		clearAttack: function () {
+			for (var i = 0; i < attackArr.length; i++) {
 				attackArr[i].remove();
 			}
 			attackArr = [];
+		},
+
+		clearAll: function() {
+			for (var i=0; i<chesses.length; i++) {
+				for (var j=0; j<chesses[i].length; j++) {
+					chesses[i][j].label.remove();
+					chesses[i][j].group.remove();
+				}
+			}
 		}
 	};
 });
@@ -283,83 +292,148 @@ thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, Ch
 	var situation;
 	var observer = {};
 	var currentChess;
+	var currentColor = ChessColor.RED;
 
 	var chessUnderAttack = [];
+
+	var undoList = [];
+	var redoList = [];
 
 	var service = {
 		init: function (data) {
 			situation = [];
-			for (var i=0; i<9; i++) {
+			for (var i = 0; i < 9; i++) {
 				situation[i] = [];
 			}
 
-			for (var i=0; i<data.length; i++) {
+			for (var i = 0; i < data.length; i++) {
 				var chess = this.factory.createChess(data[i]);
 
 				situation[chess.x][chess.y] = chess;
 			}
+
+			currentColor = ChessColor.RED;
+			undoList = [];
+			redoList = [];
 		},
 
-		click: function(handler) {
+		click: function (handler) {
 			observer["click"] = handler;
 		},
 
-		move: function(handler) {
+		move: function (handler) {
 			observer["move"] = handler;
 		},
 
-		attack: function(handler) {
+		attack: function (handler) {
 			observer["attack"] = handler;
 		},
 
-		chessClicked: function(chess) {
-			if (currentChess && (currentChess.color + chess.color == 0)) {
-				for (var i=0; i<chessUnderAttack.length; i++) {
-					if ((chessUnderAttack[i].x == chess.x) && (chessUnderAttack[i].y == chess.y)) {
-						if (observer["attack"]) {
-							observer["attack"](currentChess, chess.x, chess.y);
+		error: function (handler) {
+			observer["error"] = handler;
+		},
+
+		dispatch: function (event) {
+			if (observer[event.type]) {
+				observer[event.type](event);
+			}
+		},
+
+		chessClicked: function (chess) {
+			if (currentChess) {
+				if (currentChess.color + chess.color == 0) {
+					var dyingChess = null;
+					for (var i = 0; i < chessUnderAttack.length; i++) {
+						if ((chessUnderAttack[i].x == chess.x) && (chessUnderAttack[i].y == chess.y)) {
+							dyingChess = currentChess;
 							break;
 						}
+					}
+
+					if (dyingChess) {
+						var event = {
+							type: "attack",
+							from: {
+								x: currentChess.x,
+								y: currentChess.y
+							},
+							to: {
+								x: chess.x,
+								y: chess.y
+							}
+						};
+						this.dispatch(event);
+						return;
+
+					}
+					else {
+						var event = {
+							type: "error",
+							text: "吃不到这个棋子"
+						};
+						this.dispatch(event);
+						return;
 					}
 				}
 			}
 			else {
-				currentChess = chess;
-				var whereCanIGo = [];
-				chessUnderAttack = [];
-				for (var i=0; i<9; i++) {
-					for (var j=0; j<10; j++) {
-						if (chess.canGo(i, j)) {
-							if (this.isEmpty(i, j)) {
-								whereCanIGo.push({
-									x: i,
-									y: j
-								});
-							}
-							else {
-								chessUnderAttack.push({
-									x: i,
-									y: j
-								});
-							}
+				if (chess.color != currentColor) {
+					var event = {
+						type: "error",
+						text: "不该你走"
+					};
+					this.dispatch(event);
+					return;
+				}
+			}
+
+			currentChess = chess;
+			var whereCanIGo = [];
+			chessUnderAttack = [];
+			for (var i = 0; i < 9; i++) {
+				for (var j = 0; j < 10; j++) {
+					if (chess.canGo(i, j)) {
+						if (this.isEmpty(i, j)) {
+							whereCanIGo.push({
+								x: i,
+								y: j
+							});
+						}
+						else {
+							chessUnderAttack.push({
+								x: i,
+								y: j
+							});
 						}
 					}
 				}
-
-				if (observer["click"]) {
-					observer["click"](whereCanIGo, chessUnderAttack);
-				}
 			}
+
+			var event = {
+				type: "click",
+				canGo: whereCanIGo,
+				canKill: chessUnderAttack
+			};
+			this.dispatch(event);
 		},
 
-		blankClicked: function(x, y) {
-			if (observer["move"]) {
-				observer["move"](currentChess, x, y);
-			}
+		blankClicked: function (x, y) {
+			var event = {
+				type: "move",
+				from: {
+					x: currentChess.x,
+					y: currentChess.y
+				},
+				to: {
+					x: x,
+					y: y
+				}
+			};
+			this.dispatch(event);
 		},
 
 		isFriendly: function (color, x, y) {
-			if (this.isEmpty(x, y)) 
+			if (this.isEmpty(x, y))
 				return false;
 
 			return color + this.getChess(x, y).color != 0;
@@ -373,11 +447,15 @@ thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, Ch
 			return situation[x][y];
 		},
 
-		moveTo: function(chess, x, y) {
-			situation[chess.x][chess.y] = null;
-			chess.x = x;
-			chess.y = y;
-			situation[x][y] = chess;
+		moveTo: function (oldX, oldY, newX, newY) {
+			var chess = situation[oldX][oldY];
+			situation[oldX][oldY] = null;
+			chess.x = newX;
+			chess.y = newY;
+			situation[newX][newY] = chess;
+
+			currentColor = ChessColor.RED + ChessColor.BLACK - currentColor;
+			currentChess = null;
 		}
 	};
 
@@ -404,20 +482,22 @@ thin.define("General", ["ChessService", "ChessMan", "ChessType", "ChessColor"], 
 
 	General.prototype = {
 		valid: function (x, y) {
+			var result = true;
 			switch (this.color) {
 				case ChessColor.BLACK:
 					if ((x < 3) || (x > 5) || (y > 2)) {
-						return false;
+						result = false;
 					}
 					break;
 				case ChessColor.RED:
 					if ((x < 3) || (x > 5) || (y < 7)) {
-						return false;
+						result = false;
 					}
 					break;
 				default:
-					return true;
+					result = true;
 			}
+			return result;
 		},
 
 		canGo: function (x, y) {
@@ -610,7 +690,7 @@ thin.define("Chariot", ["ChessService", "ChessMan", "ChessType"], function (Ches
 				else {
 					if (this.y == y) {
 						if (this.x < x) {
-							for (var i= this.i + 1; i < x; i++) {
+							for (var i = this.i + 1; i < x; i++) {
 								if (!ChessService.isEmpty(i, this.y)) {
 									return false;
 								}
@@ -777,52 +857,56 @@ thin.define("Soldier", ["ChessService", "ChessMan", "ChessType", "ChessColor"], 
 
 	Soldier.prototype = {
 		valid: function (x, y) {
+			var result = true;
 			switch (this.color) {
 				case ChessColor.BLACK:
 					if ((y < 3)
 						|| ((y < 5) && (x % 2 == 1))) {
-						return false;
+						result = false;
 					}
 					break;
 				case ChessColor.RED:
 					if ((y > 6)
 						|| ((y > 4) && (x % 2 == 1))) {
-						return false;
+						result = false;
 					}
 					break;
 				default:
-					return true;
+					result = true;
 			}
+			return result;
 		},
 
 		canGo: function (x, y) {
+			var result = false;
 			if (this.valid(x, y) && !ChessService.isFriendly(this.color, x, y)) {
+				result = true;
 				switch (this.color) {
 					case ChessColor.BLACK:
 						if (y < this.y) {
-							return false;
+							result = false;
 						}
 						else {
 							if (Math.abs(x - this.x) + y - this.y != 1) {
-								return false;
+								result = false;
 							}
 						}
 						break;
 					case ChessColor.RED:
 						if (y > this.y) {
-							return false;
+							result = false;
 						}
 						else {
 							if (Math.abs(x - this.x) + this.y - y != 1) {
-								return false;
+								result = false;
 							}
 						}
 						break;
 					default:
-						return true;
+						result = true;
 				}
 			}
-			return false;
+			return result;
 		}
 	};
 
@@ -834,11 +918,11 @@ thin.define("Blank", [], function () {
 
 });
 
-thin.define("ChessFactory", ["ChessType", "ChessColor", "General", "Guard", "Staff", "Horse", "Chariot", "Cannon", "Soldier"], function(ChessType, ChessColor, General) {
+thin.define("ChessFactory", ["ChessType", "ChessColor", "General", "Guard", "Staff", "Horse", "Chariot", "Cannon", "Soldier"], function (ChessType, ChessColor, General) {
 	var ChessConstructors = [].slice.call(arguments).slice(2);
 
 	var ChessFactory = {
-		createChess: function(data) {
+		createChess: function (data) {
 			var chess;
 
 			var type = data[1];
@@ -853,7 +937,7 @@ thin.define("ChessFactory", ["ChessType", "ChessColor", "General", "Guard", "Sta
 	return ChessFactory;
 });
 
-thin.define("ChessController", ["ChessBoard", "ChessFactory", "ChessService"], function (ChessBoard, ChessFactory, ChessService) {
+thin.define("ChessController", ["ChessBoard", "ChessFactory", "ChessService", "ChessColor"], function (ChessBoard, ChessFactory, ChessService, ChessColor) {
 	//color, type, x, y
 	var chesses = [
 		[1, 7, 4, 9],
@@ -894,41 +978,42 @@ thin.define("ChessController", ["ChessBoard", "ChessFactory", "ChessService"], f
 	return {
 		init: function (element) {
 			ChessService.factory = ChessFactory;
+
+			ChessService.click(function (event) {
+				var canGo = event.canGo;
+				var canKill = event.canKill;
+
+				ChessBoard.clearBlank();
+				ChessBoard.clearAttack();
+
+				for (var i = 0; i < canGo.length; i++) {
+					ChessBoard.drawBlank(canGo[i].x, canGo[i].y);
+				}
+
+				for (var i = 0; i < canKill.length; i++) {
+					ChessBoard.drawAttack(canKill[i].x, canKill[i].y);
+				}
+			});
+
+			ChessService.move(function (event) {
+				ChessService.moveTo(event.from.x, event.from.y, event.to.x, event.to.y);
+				ChessBoard.clearBlank();
+				ChessBoard.clearAttack();
+				ChessBoard.moveChess(event.from.x, event.from.y, event.to.x, event.to.y);
+			});
+
+			ChessService.attack(function (event) {
+				ChessService.moveTo(event.from.x, event.from.y, event.to.x, event.to.y);
+				ChessBoard.clearBlank();
+				ChessBoard.clearAttack();
+				ChessBoard.attackChess(event.from.x, event.from.y, event.to.x, event.to.y);
+			});
+
+			ChessService.error(function (event) {
+				alert(event.text);
+			});
+
 			ChessService.init(chesses);
-
-			ChessService.click(function(whereCanGo, chessUnderAttack) {
-				ChessBoard.clearBlank();
-				ChessBoard.clearAttack();
-
-				for (var i=0; i<whereCanGo.length; i++) {
-					ChessBoard.drawBlank(whereCanGo[i].x, whereCanGo[i].y);
-				}
-
-				for (var i=0; i<chessUnderAttack.length; i++) {
-					ChessBoard.drawAttack(chessUnderAttack[i].x, chessUnderAttack[i].y);
-				}
-			});
-
-			ChessService.move(function(chess, x, y) {
-				var oldX = chess.x;
-				var oldY = chess.y;
-
-				ChessService.moveTo(chess, x, y);
-				ChessBoard.clearBlank();
-				ChessBoard.clearAttack();
-				ChessBoard.moveChess(oldX, oldY, x, y);
-			});
-
-			ChessService.attack(function(chess, x, y) {
-				var oldX = chess.x;
-				var oldY = chess.y;
-
-				ChessService.moveTo(chess, x, y);
-				ChessBoard.clearBlank();
-				ChessBoard.clearAttack();
-				ChessBoard.attackChess(oldX, oldY, x, y);
-			});
-
 			ChessBoard.drawBoard(element);
 			ChessBoard.drawChess();
 		}
