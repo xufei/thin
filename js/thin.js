@@ -57,19 +57,39 @@
 			return module.entity;
 		},
 
-		require: function(path, callback) {
-			var head = document.getElementsByTagName('head')[0];
-			var node = document.createElement('script');
-			node.type = 'text/javascript';
-			node.async = 'true';
-			node.src = path + '.js';
-			node.onload = function() {
-				head.removeChild(node);
+		require: function(pathArr, callback) {
 
-				callback();
-			};
-			fileMap[path] = true;
-			head.appendChild(node);
+			for (var i=0; i<pathArr.length; i++) {
+				var path = pathArr[i];
+
+				if (!fileMap[path]) {
+					var head = document.getElementsByTagName('head')[0];
+					var node = document.createElement('script');
+					node.type = 'text/javascript';
+					node.async = 'true';
+					node.src = path + '.js';
+					node.onload = function() {
+						head.removeChild(node);
+						checkAllFiles();
+					};
+					fileMap[path] = true;
+					head.appendChild(node);
+				}
+			}
+
+			function checkAllFiles() {
+				var allLoaded = true;
+				for (var i=0; i<pathArr.length; i++) {
+					if (!fileMap[pathArr[i]]) {
+						allLoaded = false;
+						break;
+					}
+				}
+
+				if (allLoaded) {
+					callback();
+				}
+			}
 		},
 
 		ready: function() {
