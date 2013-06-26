@@ -1,5 +1,6 @@
 (function (doc) {
 	var moduleMap = {};
+	var fileMap = {};
 
 	//简单的对象属性复制，把源对象上的属性复制到自己身上，只复制一层
 	Object.prototype.extend = function (base) {
@@ -54,6 +55,21 @@
 			}
 
 			return module.entity;
+		},
+
+		require: function(path, callback) {
+			var head = document.getElementsByTagName('head')[0];
+			var node = document.createElement('script');
+			node.type = 'text/javascript';
+			node.async = 'true';
+			node.src = path + '.js';
+			node.onload = function() {
+				head.removeChild(node);
+
+				callback();
+			};
+			fileMap[path] = true;
+			head.appendChild(node);
 		},
 
 		ready: function() {

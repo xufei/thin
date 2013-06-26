@@ -340,17 +340,26 @@ thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, Ch
 		},
 
 		chessClicked: function (chess) {
+			if (currentColor == ChessColor.GREY) {
+				var event = {
+					type: "error",
+					text: "棋局已终止！"
+				};
+				this.dispatch(event);
+				return;
+			}
+
 			if (currentChess) {
 				if (currentChess.color + chess.color == 0) {
-					var dyingChess = null;
+					var canKill = false;
 					for (var i = 0; i < chessUnderAttack.length; i++) {
 						if ((chessUnderAttack[i].x == chess.x) && (chessUnderAttack[i].y == chess.y)) {
-							dyingChess = currentChess;
+							canKill = true;
 							break;
 						}
 					}
 
-					if (dyingChess) {
+					if (canKill) {
 						var event = {
 							type: "attack",
 							from: {
@@ -363,13 +372,22 @@ thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, Ch
 							}
 						};
 						this.dispatch(event);
-						return;
 
+						if (chess.type == ChessType.GENERAL) {
+							var winColor = (chess.color == ChessColor.RED) ? "黑" : "红";
+							var event = {
+								type: "error",
+								text: "结束啦，" + winColor + "方胜利！"
+							};
+							this.dispatch(event);
+							currentColor = ChessColor.GREY;
+						}
+						return;
 					}
 					else {
 						var event = {
 							type: "error",
-							text: "吃不到这个棋子"
+							text: "吃不到这个棋子！"
 						};
 						this.dispatch(event);
 						return;
@@ -380,7 +398,7 @@ thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, Ch
 				if (chess.color != currentColor) {
 					var event = {
 						type: "error",
-						text: "不该你走"
+						text: "不该你走！"
 					};
 					this.dispatch(event);
 					return;
