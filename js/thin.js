@@ -1,16 +1,7 @@
 (function (doc) {
 	var moduleMap = {};
 	var fileMap = {};
-
-	//简单的对象属性复制，把源对象上的属性复制到自己身上，只复制一层
-	Object.prototype.extend = function (base) {
-		for (var key in base) {
-			if (base.hasOwnProperty(key)) {
-				this[key] = base[key];
-			}
-		}
-		return this;
-	};
+	var readyFunctions = [];
 
 	var noop = function () {
 	};
@@ -22,8 +13,32 @@
 		});
 	};
 
-	var thin = {
-		define: function(name, dependencies, factory) {
+	var thin = function () {
+	};
+
+	var addListener = document.addEventListener || document.attachEvent,
+		removeListener = document.removeEventListener || document.detachEvent;
+
+	var eventName = document.addEventListener ? "DOMContentLoaded" : "onreadystatechange";
+
+	addListener.call(document, eventName, function () {
+		for (var i = 0; i < readyFunctions.length; i++) {
+			readyFunctions[i]();
+		}
+	}, false);
+
+	//简单的对象属性复制，把源对象上的属性复制到自己身上，只复制一层
+	Object.prototype.extend = function (base) {
+		for (var key in base) {
+			if (base.hasOwnProperty(key)) {
+				this[key] = base[key];
+			}
+		}
+		return this;
+	};
+
+	window.thin = thin.extend({
+		define: function (name, dependencies, factory) {
 			if (!moduleMap[name]) {
 				var module = {
 					name: name,
@@ -37,12 +52,12 @@
 			return moduleMap[name];
 		},
 
-		use: function(name) {
+		use: function (name) {
 			var module = moduleMap[name];
 
 			if (!module.entity) {
 				var args = [];
-				for (var i=0; i<module.dependencies.length; i++) {
+				for (var i = 0; i < module.dependencies.length; i++) {
 					if (moduleMap[module.dependencies[i]].entity) {
 						args.push(moduleMap[module.dependencies[i]].entity);
 					}
@@ -57,29 +72,29 @@
 			return module.entity;
 		},
 
-		require: function(pathArr, callback) {
-
-			for (var i=0; i<pathArr.length; i++) {
+		require: function (pathArr, callback) {
+			for (var i = 0; i < pathArr.length; i++) {
 				var path = pathArr[i];
 
 				if (!fileMap[path]) {
 					var head = document.getElementsByTagName('head')[0];
-					var node = document.createElement('script');
-					node.type = 'text/javascript';
-					node.async = 'true';
-					node.src = path + '.js';
-					node.onload = function() {
-						head.removeChild(node);
-						checkAllFiles();
+					var script = document.createElement('script');
+					script.setAttribute('type', 'text/javascript');
+					script.setAttribute('src', path + '.js');
+					script.onload = script.onreadystatechange = function () {
+						if ((!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
+							fileMap[path] = true;
+							head.removeChild(script);
+							checkAllFiles();
+						}
 					};
-					fileMap[path] = true;
-					head.appendChild(node);
+					head.appendChild(script);
 				}
 			}
 
 			function checkAllFiles() {
 				var allLoaded = true;
-				for (var i=0; i<pathArr.length; i++) {
+				for (var i = 0; i < pathArr.length; i++) {
 					if (!fileMap[pathArr[i]]) {
 						allLoaded = false;
 						break;
@@ -92,49 +107,36 @@
 			}
 		},
 
-		ready: function() {
+		ready: function (handler) {
+			readyFunctions.push(handler);
+		},
+
+		error: function () {
 
 		},
 
-		error: function() {
-
-		},
-
-		log: function() {
+		log: function () {
 
 		}
-	};
-
-	window.thin = thin;
+	});
 })(document);
 
-thin.define("AJAX", [], function() {
-
-});
-
-thin.define("ModuleLoader", [], function() {
-
-});
-
-thin.define("EventDispatcher", [], function() {
-	//事件派发机制的实现
-	var EventDispatcher = {
-		addEventListener: function (eventType, handler) {
-			//事件的存储
+//Observer
+thin.define("Observer", [], function () {
+	var Observer = {
+		on: function (eventType, handler) {
 			if (!this.eventMap) {
 				this.eventMap = {};
 			}
 
-			//对每个事件，允许添加多个监听
+			//multiple event listener
 			if (!this.eventMap[eventType]) {
 				this.eventMap[eventType] = [];
 			}
-
-			//把回调函数放入事件的执行数组
 			this.eventMap[eventType].push(handler);
 		},
 
-		removeEventListener: function (eventType, handler) {
+		off: function (eventType, handler) {
 			for (var i = 0; i < this.eventMap[eventType].length; i++) {
 				if (this.eventMap[eventType][i] === handler) {
 					this.eventMap[eventType].splice(i, 1);
@@ -143,22 +145,22 @@ thin.define("EventDispatcher", [], function() {
 			}
 		},
 
-		dispatchEvent: function (event) {
+		fire: function (event) {
 			var eventType = event.type;
 			if (this.eventMap && this.eventMap[eventType]) {
 				for (var i = 0; i < this.eventMap[eventType].length; i++) {
-					//把对当前事件添加的处理函数拿出来挨个执行
 					this.eventMap[eventType][i](event);
 				}
 			}
 		}
 	};
 
-	return EventDispatcher;
+	return Observer;
 });
 
-thin.define("EventBus", ["EventDispatcher"], function(EventDispatcher) {
-	var EventBus = {}.extend(EventDispatcher);
+//Global observer, all event go my home
+thin.define("EventBus", ["Observer"], function (Observer) {
+	var EventBus = {}.extend(Observer);
 
 	return EventBus;
 });

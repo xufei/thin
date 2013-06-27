@@ -13,9 +13,15 @@
 	<div id="chessContainer"></div>
 
 	<script type="text/javascript">
-		thin.require(["../js/modules/chess/chess"], function() {
-			var chessController = thin.use("ChessController");
-			chessController.init(document.getElementById("chessContainer"));
+		thin.ready(function() {
+			thin.require(["../js/modules/chess/chess"], function() {
+				var chessController = thin.use("ChessController");
+				chessController.init(document.getElementById("chessContainer"));
+			});
+		});
+
+		thin.ready(function() {
+			alert("ready");
 		});
 	</script>
 </body>

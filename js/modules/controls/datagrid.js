@@ -1,7 +1,7 @@
 
-thin.module("DataGrid", ["EventDispatcher"], function(EventDispatcher) {
+thin.define("DataGrid", ["Observer"], function(Observer) {
 	//作为一个控件，它的容器必须传入
-	function DataGrid(element) {
+	var DataGrid = function(element) {
 		this.columns = [];
 		this.rows = [];
 
@@ -47,7 +47,7 @@ thin.module("DataGrid", ["EventDispatcher"], function(EventDispatcher) {
 			this.rows.push(row);
 
 			var that = this;
-			row.addEventListener("selected", function (event) {
+			row.on("selected", function (event) {
 				that.select(event.row);
 			});
 
@@ -57,7 +57,7 @@ thin.module("DataGrid", ["EventDispatcher"], function(EventDispatcher) {
 				newRow: row,
 				target: this
 			};
-			this.dispatchEvent(event);
+			this.fire(event);
 		},
 
 		removeRow: function (row) {
@@ -80,7 +80,7 @@ thin.module("DataGrid", ["EventDispatcher"], function(EventDispatcher) {
 				type: "rowRemoved",
 				target: this
 			};
-			this.dispatchEvent(event);
+			this.fire(event);
 		},
 
 		select: function (row) {
@@ -101,11 +101,11 @@ thin.module("DataGrid", ["EventDispatcher"], function(EventDispatcher) {
 
 			this.selectedRow = row;
 
-			this.dispatchEvent(event);
+			this.fire(event);
 		}
-	}.extend(EventDispatcher);
+	}.extend(Observer);
 
-	function DataRow(data, grid) {
+	var DataRow = function(data, grid) {
 		this.data = data;
 		this.grid = grid;
 
@@ -130,7 +130,7 @@ thin.module("DataGrid", ["EventDispatcher"], function(EventDispatcher) {
 					target: that,
 					row: that
 				};
-				that.dispatchEvent(newEvent);
+				that.fire(newEvent);
 			}
 		},
 
@@ -171,7 +171,7 @@ thin.module("DataGrid", ["EventDispatcher"], function(EventDispatcher) {
 				this.dom.childNodes[i].innerHTML = data[this.grid.columns[i].field] || "";
 			}
 		}
-	}.extend(EventDispatcher);
+	}.extend(Observer);
 
 	return DataGrid;
 });
