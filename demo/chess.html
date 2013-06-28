@@ -10,19 +10,20 @@
 	<script type="text/javascript" src="../libs/raphael-min.js"></script>
 </head>
 <body>
-	<div id="chessContainer"></div>
+<div id="chessContainer"></div>
 
-	<script type="text/javascript">
-		thin.ready(function() {
-			thin.require(["../js/modules/chess/chess"], function() {
-				var chessController = thin.use("ChessController");
-				chessController.init(document.getElementById("chessContainer"));
-			});
+<script type="text/javascript">
+	thin.ready(function () {
+		thin.require(["../js/modules/chess/config",
+			"../js/modules/chess/service",
+			"../js/modules/chess/chessman",
+			"../js/modules/chess/factory",
+			"../js/modules/chess/chessboard",
+			"../js/modules/chess/controller"], function () {
+			var chessController = thin.use("ChessController");
+			chessController.init(document.getElementById("chessContainer"));
 		});
-
-		thin.ready(function() {
-			alert("ready");
-		});
-	</script>
+	});
+</script>
 </body>
 </html>

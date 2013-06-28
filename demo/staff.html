@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Staff Management</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="DataGrid">
+	<meta name="author" content="xu.fei@outlook.com">
+
+	<link href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css" rel="stylesheet"/>
+	<script type="text/javascript" src="../js/thin.js"></script>
+</head>
+<body>
+<div class="span12">
+	<div class="header">
+		<h3>Staff Management</h3>
+	</div>
+	<div>
+		<div id="grid1" class="row"></div>
+		<div class="row">
+			<div class="header">
+				<h4>Detail</h4>
+			</div>
+			<hr/>
+			<form class="form-horizontal span6">
+				<div class="control-group">
+					<label class="control-label" for="inputIndex">Index</label>
+					<div class="controls">
+						<input type="text" id="inputIndex" placeholder="Index">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="inputGender">Gender</label>
+					<div class="controls">
+						<input type="text" id="inputGender" placeholder="Gender">
+					</div>
+				</div>
+			</form>
+			<form class="form-horizontal span6">
+				<div class="control-group">
+					<label class="control-label" for="inputName">Name</label>
+					<div class="controls">
+						<input type="text" id="inputName" placeholder="Name">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="inputAge">Age</label>
+					<div class="controls">
+						<input type="text" id="inputAge" placeholder="age">
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<div id="operateBtns">
+			<button id="newBtn" class="btn btn-primary">New</button>
+			<button id="modifyBtn" class="btn btn-primary"><i class="icon-edit icon-white"></i>Modify</button>
+			<button id="deleteBtn" class="btn btn-primary"><i class="icon-remove icon-white"></i>Delete</button>
+		</div>
+		<div id="confirmBtns">
+			<button id="okBtn" class="btn btn-primary"><i class="icon-ok icon-white"></i>OK</button>
+			<button id="cancelBtn" class="btn btn-primary">Cancel</button>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	thin.ready(function() {
+		thin.require(["../js/modules/controls/datagrid", "js/staffManage"], function() {
+			var staffManage = thin.use("StaffManage");
+			staffManage.init();
+		});
+	});
+</script>
+</body>
+</html>

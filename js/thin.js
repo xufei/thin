@@ -74,22 +74,22 @@
 
 		require: function (pathArr, callback) {
 			for (var i = 0; i < pathArr.length; i++) {
-				var path = pathArr[i];
+				loadFile(pathArr[i]);
+			}
 
-				if (!fileMap[path]) {
-					var head = document.getElementsByTagName('head')[0];
-					var script = document.createElement('script');
-					script.setAttribute('type', 'text/javascript');
-					script.setAttribute('src', path + '.js');
-					script.onload = script.onreadystatechange = function () {
-						if ((!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
-							fileMap[path] = true;
-							head.removeChild(script);
-							checkAllFiles();
-						}
-					};
-					head.appendChild(script);
-				}
+			function loadFile(file) {
+				var head = document.getElementsByTagName('head')[0];
+				var script = document.createElement('script');
+				script.setAttribute('type', 'text/javascript');
+				script.setAttribute('src', file + '.js');
+				script.onload = script.onreadystatechange = function () {
+					if ((!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
+						fileMap[file] = true;
+						head.removeChild(script);
+						checkAllFiles();
+					}
+				};
+				head.appendChild(script);
 			}
 
 			function checkAllFiles() {

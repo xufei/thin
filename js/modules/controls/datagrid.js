@@ -37,7 +37,7 @@ thin.define("DataGrid", ["Observer"], function(Observer) {
 				type: "loadCompleted",
 				target: this
 			};
-			this.dispatchEvent(event);
+			this.fire(event);
 		},
 
 		insertRow: function (data) {
