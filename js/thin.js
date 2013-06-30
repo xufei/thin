@@ -52,7 +52,7 @@
 			return moduleMap[name];
 		},
 
-		use: function (name) {
+		use: function (name, isViewModel) {
 			var module = moduleMap[name];
 
 			if (!module.entity) {
@@ -64,6 +64,10 @@
 					else {
 						args.push(this.use(module.dependencies[i]));
 					}
+				}
+
+				if (isViewModel) {
+					args.push({});
 				}
 
 				module.entity = module.factory.apply(noop, args);

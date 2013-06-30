@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Component Demo</title>
+
+	<script type="text/javascript" src="../js/thin.js"></script>
+</head>
+<body>
+	<div id="areaDiv">
+		<form class="form-horizontal span6" vm-model="Area">
+			<div class="control-group">
+				<label class="control-label">Name</label>
+				<div class="controls">
+					<input type="text" vm-value="name" placeholder="Name">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Code</label>
+				<div class="controls">
+					<input type="text" vm-value="code" placeholder="Code">
+				</div>
+			</div>
+			<button vm-click="myClick">Test</button>
+		</form>
+
+		<form class="form-horizontal span6" vm-model="Area">
+			<div class="control-group">
+				<label class="control-label">Name</label>
+				<div class="controls">
+					<input type="text" vm-value="name" placeholder="Name">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Code</label>
+				<div class="controls">
+					<input type="text" vm-value="code" placeholder="Code">
+				</div>
+			</div>
+			<button vm-click="myClick">Test</button>
+		</form>
+	</div>
+	<script type="text/javascript">
+		thin.define("Area", [], function(vm) {
+			function Area() {
+				this.name = "Test";
+				this.code = "abc";
+
+				this.myClick = function() {
+					this.code += "a";
+				}
+			}
+
+			return Area;
+		});
+
+		/*
+		thin.ready(function() {
+			thin.require(["../js/modules/core/binding",
+			"../js/modules/core/remote",
+			"../js/modules/core/utils"], function() {
+				var component = thin.use("Component");
+				component.load("partial/form.html");
+			});
+		});
+		*/
+
+		thin.ready(function() {
+			thin.require(["../js/modules/core/binding",
+			"../js/modules/core/remote",
+			"../js/modules/core/utils"], function() {
+				var component = thin.use("Component");
+				component.parse(document.getElementById("areaDiv"));
+			});
+		})
+	</script>
+</body>
+</html>
