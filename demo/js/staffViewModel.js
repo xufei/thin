@@ -1,155 +1,150 @@
 
 thin.define("StaffViewModel", ["DataGrid"], function(DataGrid, vm) {
-	var state = "View";
+	function StaffViewModel() {
+		this.state = "View";
 
-	var grid = new DataGrid(document.getElementById("grid1"));
+		var that = this;
 
-	grid.on("loadCompleted", function(event) {
-		if (event.target.rows.length > 0) {
-			event.target.select(event.target.rows[0]);
-		}
-	});
+		var grid = new DataGrid(document.getElementById("grid1"));
 
-	grid.on("changed", function(event) {
-		var data;
-		if (event.newRow) {
-			data = event.newRow.data;
-		}
-		else {
-			data = {};
-		}
+		grid.on("loadCompleted", function(event) {
+			if (event.target.rows.length > 0) {
+				event.target.select(event.target.rows[0]);
+			}
+		});
 
-		setFormData(data);
-	});
+		grid.on("changed", function(event) {
+			var data;
+			if (event.newRow) {
+				data = event.newRow.data;
+			}
+			else {
+				data = {};
+			}
 
-	grid.on("rowInserted", function(event) {
-		event.target.select(event.newRow);
-	});
+			that.setFormData(data);
+		});
 
-	grid.on("rowRemoved", function(event) {
-		if (event.target.rows.length > 0) {
-			event.target.select(event.target.rows[0]);
-		}
-	});
+		grid.on("rowInserted", function(event) {
+			event.target.select(event.newRow);
+		});
 
-	function init() {
-		enableForm(false);
-		switchButtons("Operate");
+		grid.on("rowRemoved", function(event) {
+			if (event.target.rows.length > 0) {
+				event.target.select(event.target.rows[0]);
+			}
+		});
 
-		var columns = [{
-			label: "#",
-			field: "index"
-		}, {
-			label: "Name",
-			field: "name"
-		}, {
-			label: "Gender",
-			field: "gender"
-		}, {
-			label: "Age",
-			field: "age"
-		}];
-
-		var data = [{
-			index: 1,
-			name: "Tom",
-			gender: "Male",
-			age: 5
-		}, {
-			index: 2,
-			name: "Jerry",
-			gender: "Female",
-			age: 2
-		}, {
-			index: 3,
-			name: "Sun Wukong",
-			gender: "Male",
-			age: 1024
-		}];
-
-		grid.loadColumns(columns);
-		grid.loadData(data);
+		this.grid = grid;
+		this.init();
 	}
 
+	StaffViewModel.prototype = {
+		init: function() {
+			this.enableForm = false;
+			this.switchButtons("Operate");
 
-	//add event handler
-	document.getElementById("newBtn").onclick = function() {
-		state = "New";
-		switchButtons("Confirm");
-		enableForm(true);
+			var columns = [{
+				label: "#",
+				field: "index"
+			}, {
+				label: "Name",
+				field: "name"
+			}, {
+				label: "Gender",
+				field: "gender"
+			}, {
+				label: "Age",
+				field: "age"
+			}];
 
-		setFormData({});
+			var data = [{
+				index: 1,
+				name: "Tom",
+				gender: "Male",
+				age: 5
+			}, {
+				index: 2,
+				name: "Jerry",
+				gender: "Female",
+				age: 2
+			}, {
+				index: 3,
+				name: "Sun Wukong",
+				gender: "Male",
+				age: 1024
+			}];
+
+			this.grid.loadColumns(columns);
+			this.grid.loadData(data);
+		},
+
+		newClick: function() {
+			this.state = "New";
+			this.switchButtons("Confirm");
+			this.enableForm = true;
+
+			this.setFormData({});
+		},
+
+		modifyClick: function() {
+			this.state = "Modify";
+			this.switchButtons("Confirm");
+			this.enableForm = true;
+		},
+
+		deleteClick: function() {
+			if (confirm("Sure?")) {
+				this.grid.removeRow(grid.selectedRow);
+			}
+		},
+
+		okClick: function() {
+			var data = this.getFormData();
+
+			if (this.state === "New") {
+				this.grid.insertRow(data);
+			}
+			else if (this.state === "Modify") {
+				this.grid.selectedRow.refresh(data);
+			}
+			this.state = "View";
+			this.switchButtons("Operate");
+			this.enableForm = false;
+		},
+
+		cancelClick: function() {
+			this.state = "View";
+			this.switchButtons("Operate");
+			this.enableForm = false;
+
+			this.setFormData(grid.selectedRow.data);
+		},
+
+		switchButtons: function(group) {
+			if (group === "Operate") {
+				document.getElementById("operateBtns").style.display = "";
+				document.getElementById("confirmBtns").style.display = "none";
+			}
+			else if (group === "Confirm") {
+				document.getElementById("operateBtns").style.display = "none";
+				document.getElementById("confirmBtns").style.display = "";
+			}
+		},
+
+		getFormData: function() {
+			return {
+				index: this.index,
+				name: this.name,
+				gender: this.gender,
+				age: this.age
+			};
+		},
+
+		setFormData: function(data) {
+			this.extend(data);
+		}
 	};
 
-	document.getElementById("modifyBtn").onclick = function() {
-		state = "Modify";
-		switchButtons("Confirm");
-		enableForm(true);
-	}
-
-	document.getElementById("deleteBtn").onclick = function() {
-		if (confirm("Sure?")) {
-			grid.removeRow(grid.selectedRow);
-		}
-	}
-
-	document.getElementById("okBtn").onclick = function() {
-		var data = getFormData();
-
-		if (state === "New") {
-			grid.insertRow(data);
-		}
-		else if (state === "Modify") {
-			grid.selectedRow.refresh(data);
-		}
-		state = "View";
-		switchButtons("Operate");
-		enableForm(false);
-	}
-
-	document.getElementById("cancelBtn").onclick = function() {
-		state = "View";
-		switchButtons("Operate");
-		enableForm(false);
-
-		setFormData(grid.selectedRow.data);
-	}
-
-	function enableForm(flag) {
-		document.getElementById("inputIndex").disabled = !flag;
-		document.getElementById("inputName").disabled = !flag;
-		document.getElementById("inputGender").disabled = !flag;
-		document.getElementById("inputAge").disabled = !flag;
-	}
-
-	function switchButtons(group) {
-		if (group === "Operate") {
-			document.getElementById("operateBtns").style.display = "";
-			document.getElementById("confirmBtns").style.display = "none";
-		}
-		else if (group === "Confirm") {
-			document.getElementById("operateBtns").style.display = "none";
-			document.getElementById("confirmBtns").style.display = "";
-		}
-	}
-
-	function getFormData() {
-		return {
-			index: document.getElementById("inputIndex").value,
-			name: document.getElementById("inputName").value,
-			gender: document.getElementById("inputGender").value,
-			age: document.getElementById("inputAge").value
-		};
-	}
-
-	function setFormData(data) {
-		document.getElementById("inputIndex").value = data.index || "";
-		document.getElementById("inputName").value = data.name || "";
-		document.getElementById("inputGender").value = data.gender || "";
-		document.getElementById("inputAge").value = data.age || "";
-	}
-
-	return {
-		init: init
-	};
+	return StaffViewModel;
 });
