@@ -29,6 +29,11 @@ thin.define("Component", ["AJAX", "DOMUtil"], function(AJAX, DOMHelper) {
 	function parseElement(element, vm) {
 		if (element.nodeType == "1") {
 			var model = vm;
+
+			if (element.getAttribute("vm-model")) {
+				model = bindModel(element, element.getAttribute("vm-model"));
+			}
+
 			var attrs = element.attributes;
 			for (var i=0; i<attrs.length; i++) {
 				var attr = attrs[i];
@@ -37,7 +42,7 @@ thin.define("Component", ["AJAX", "DOMUtil"], function(AJAX, DOMHelper) {
 
 					switch (type) {
 						case "model":
-							model = bindModel(element, attr.value);
+							//model = bindModel(element, attr.value);
 							break;
 						case "init":
 							bindInit(element, attr.value, model);
