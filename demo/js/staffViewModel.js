@@ -1,48 +1,46 @@
 
 thin.define("StaffViewModel", ["DataGrid"], function(DataGrid, vm) {
 	function StaffViewModel() {
-		this.state = "View";
-
-		var that = this;
-
-		var grid = new DataGrid(document.getElementById("grid1"));
-
-		grid.on("loadCompleted", function(event) {
-			if (event.target.rows.length > 0) {
-				event.target.select(event.target.rows[0]);
-			}
-		});
-
-		grid.on("changed", function(event) {
-			var data;
-			if (event.newRow) {
-				data = event.newRow.data;
-			}
-			else {
-				data = {};
-			}
-
-			that.setFormData(data);
-		});
-
-		grid.on("rowInserted", function(event) {
-			event.target.select(event.newRow);
-		});
-
-		grid.on("rowRemoved", function(event) {
-			if (event.target.rows.length > 0) {
-				event.target.select(event.target.rows[0]);
-			}
-		});
-
-		this.grid = grid;
-		this.init();
 	}
 
 	StaffViewModel.prototype = {
 		init: function() {
+			var that = this;
+
+			var grid = new DataGrid(this.staffGrid);
+
+			grid.on("loadCompleted", function(event) {
+				if (event.target.rows.length > 0) {
+					event.target.select(event.target.rows[0]);
+				}
+			});
+
+			grid.on("changed", function(event) {
+				var data;
+				if (event.newRow) {
+					data = event.newRow.data;
+				}
+				else {
+					data = {};
+				}
+
+				that.setFormData(data);
+			});
+
+			grid.on("rowInserted", function(event) {
+				event.target.select(event.newRow);
+			});
+
+			grid.on("rowRemoved", function(event) {
+				if (event.target.rows.length > 0) {
+					event.target.select(event.target.rows[0]);
+				}
+			});
+
+			this.grid = grid;
+			this.state = "View";
 			this.enableForm = false;
-			this.switchButtons("Operate");
+			this.editing = false;
 
 			var columns = [{
 				label: "#",
@@ -81,7 +79,7 @@ thin.define("StaffViewModel", ["DataGrid"], function(DataGrid, vm) {
 
 		newClick: function() {
 			this.state = "New";
-			this.switchButtons("Confirm");
+			this.editing = true;
 			this.enableForm = true;
 
 			this.setFormData({});
@@ -89,13 +87,13 @@ thin.define("StaffViewModel", ["DataGrid"], function(DataGrid, vm) {
 
 		modifyClick: function() {
 			this.state = "Modify";
-			this.switchButtons("Confirm");
+			this.editing = true;
 			this.enableForm = true;
 		},
 
 		deleteClick: function() {
 			if (confirm("Sure?")) {
-				this.grid.removeRow(grid.selectedRow);
+				this.grid.removeRow(this.grid.selectedRow);
 			}
 		},
 
@@ -109,27 +107,16 @@ thin.define("StaffViewModel", ["DataGrid"], function(DataGrid, vm) {
 				this.grid.selectedRow.refresh(data);
 			}
 			this.state = "View";
-			this.switchButtons("Operate");
+			this.editing = false;
 			this.enableForm = false;
 		},
 
 		cancelClick: function() {
 			this.state = "View";
-			this.switchButtons("Operate");
+			this.editing = false;
 			this.enableForm = false;
 
-			this.setFormData(grid.selectedRow.data);
-		},
-
-		switchButtons: function(group) {
-			if (group === "Operate") {
-				document.getElementById("operateBtns").style.display = "";
-				document.getElementById("confirmBtns").style.display = "none";
-			}
-			else if (group === "Confirm") {
-				document.getElementById("operateBtns").style.display = "none";
-				document.getElementById("confirmBtns").style.display = "";
-			}
+			this.setFormData(this.grid.selectedRow.data);
 		},
 
 		getFormData: function() {
@@ -142,7 +129,10 @@ thin.define("StaffViewModel", ["DataGrid"], function(DataGrid, vm) {
 		},
 
 		setFormData: function(data) {
-			this.extend(data);
+			this.index = data.index;
+			this.name = data.name;
+			this.gender = data.gender;
+			this.age = data.age;
 		}
 	};
 

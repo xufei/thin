@@ -37,6 +37,38 @@
 		return this;
 	};
 
+	var Observer = {
+		on: function (eventType, handler) {
+			if (!this.eventMap) {
+				this.eventMap = {};
+			}
+
+			//multiple event listener
+			if (!this.eventMap[eventType]) {
+				this.eventMap[eventType] = [];
+			}
+			this.eventMap[eventType].push(handler);
+		},
+
+		off: function (eventType, handler) {
+			for (var i = 0; i < this.eventMap[eventType].length; i++) {
+				if (this.eventMap[eventType][i] === handler) {
+					this.eventMap[eventType].splice(i, 1);
+					break;
+				}
+			}
+		},
+
+		fire: function (event) {
+			var eventType = event.type;
+			if (this.eventMap && this.eventMap[eventType]) {
+				for (var i = 0; i < this.eventMap[eventType].length; i++) {
+					this.eventMap[eventType][i](event);
+				}
+			}
+		}
+	};
+
 	window.thin = thin.extend({
 		define: function (name, dependencies, factory) {
 			if (!moduleMap[name]) {
@@ -67,7 +99,7 @@
 				}
 
 				if (isViewModel) {
-					args.push({});
+					args.push({}.extend(Observer));
 				}
 
 				module.entity = module.factory.apply(noop, args);
@@ -119,52 +151,20 @@
 
 		},
 
-		log: function () {
-
+		log: function (obj) {
+			console.log(obj);
 		}
 	});
+
+	//Observer
+	thin.define("Observer", [], function () {
+		return Observer;
+	});
+
+	//Global observer, all event go my home
+	thin.define("EventBus", ["Observer"], function (Observer) {
+		var EventBus = {}.extend(Observer);
+
+		return EventBus;
+	});
 })(document);
-
-//Observer
-thin.define("Observer", [], function () {
-	var Observer = {
-		on: function (eventType, handler) {
-			if (!this.eventMap) {
-				this.eventMap = {};
-			}
-
-			//multiple event listener
-			if (!this.eventMap[eventType]) {
-				this.eventMap[eventType] = [];
-			}
-			this.eventMap[eventType].push(handler);
-		},
-
-		off: function (eventType, handler) {
-			for (var i = 0; i < this.eventMap[eventType].length; i++) {
-				if (this.eventMap[eventType][i] === handler) {
-					this.eventMap[eventType].splice(i, 1);
-					break;
-				}
-			}
-		},
-
-		fire: function (event) {
-			var eventType = event.type;
-			if (this.eventMap && this.eventMap[eventType]) {
-				for (var i = 0; i < this.eventMap[eventType].length; i++) {
-					this.eventMap[eventType][i](event);
-				}
-			}
-		}
-	};
-
-	return Observer;
-});
-
-//Global observer, all event go my home
-thin.define("EventBus", ["Observer"], function (Observer) {
-	var EventBus = {}.extend(Observer);
-
-	return EventBus;
-});

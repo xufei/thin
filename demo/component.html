@@ -7,7 +7,7 @@
 </head>
 <body>
 	<div id="areaDiv">
-		<form class="form-horizontal span6" vm-model="Area">
+		<form class="form-horizontal span6" vm-model="Area" vm-init="init">
 			<div class="control-group">
 				<label class="control-label">Name</label>
 				<div class="controls">
@@ -20,10 +20,10 @@
 					<input type="text" vm-value="code" placeholder="Code">
 				</div>
 			</div>
-			<button vm-click="myClick">Test</button>
+			<input type="button" vm-click="myClick" value="Test"/>
 		</form>
 
-		<form class="form-horizontal span6" vm-model="Area">
+		<form class="form-horizontal span6" vm-model="Area" vm-init="init">
 			<div class="control-group">
 				<label class="control-label">Name</label>
 				<div class="controls">
@@ -36,19 +36,24 @@
 					<input type="text" vm-value="code" placeholder="Code">
 				</div>
 			</div>
-			<button vm-click="myClick">Test</button>
+			<input type="button" vm-click="myClick" value="Test"/>
 		</form>
 	</div>
 	<script type="text/javascript">
 		thin.define("Area", [], function(vm) {
 			function Area() {
-				this.name = "Test";
-				this.code = "abc";
+			}
 
-				this.myClick = function() {
+			Area.prototype = {
+				init: function() {
+					this.name = "Test";
+					this.code = "abc";
+				},
+
+				myClick: function() {
 					this.code += "a";
 				}
-			}
+			};
 
 			return Area;
 		});
