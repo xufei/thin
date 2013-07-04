@@ -152,7 +152,12 @@
 		},
 
 		log: function (obj) {
-			console.log(obj);
+            try {
+                console.log(obj);
+            }
+            catch (ex) {
+
+            }
 		}
 	});
 

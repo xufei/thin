@@ -1,6 +1,9 @@
 
 thin.define("StaffViewModel", ["DataGrid"], function(DataGrid, vm) {
 	function StaffViewModel() {
+        this.state = "View";
+        this.enableForm = false;
+        this.editing = false;
 	}
 
 	StaffViewModel.prototype = {
@@ -38,9 +41,6 @@ thin.define("StaffViewModel", ["DataGrid"], function(DataGrid, vm) {
 			});
 
 			this.grid = grid;
-			this.state = "View";
-			this.enableForm = false;
-			this.editing = false;
 
 			var columns = [{
 				label: "#",

@@ -2,7 +2,6 @@
 
 thin.define("Component", ["AJAX", "DOMUtil"], function(AJAX, DOMHelper) {
 	var vmMap = {};
-	var queue = [];
 
 	function loadTemplate(url, vm) {
 		AJAX.get(url, function() {
@@ -15,70 +14,81 @@ thin.define("Component", ["AJAX", "DOMUtil"], function(AJAX, DOMHelper) {
 		});
 	}
 
-	function next() {
-		while (queue.length > 0)
-			queue.shift()();
-	}
-
 	function parseTemplate(dom) {
 		parseElement(dom);
-
-		next();
 	}
 
 	function parseElement(element, vm) {
-		if (element.nodeType == "1") {
-			var model = vm;
+		var model = vm;
 
-			if (element.getAttribute("vm-model")) {
-				model = bindModel(element, element.getAttribute("vm-model"));
-			}
+		if (element.getAttribute("vm-model")) {
+			model = bindModel(element.getAttribute("vm-model"));
+		}
 
-			var attrs = element.attributes;
-			for (var i=0; i<attrs.length; i++) {
-				var attr = attrs[i];
-				if (attr.name.indexOf("vm-") == 0) {
-					var type = attr.name.slice(3);
+		for (var i=0; i<element.attributes.length; i++) {
+			parseAttribute(element, element.attributes[i], model);
+		}
 
-					switch (type) {
-						case "model":
-							//model = bindModel(element, attr.value);
-							break;
-						case "init":
-							bindInit(element, attr.value, model);
-							break;
-						case "value":
-							bindValue(element, attr.value, model);
-							break;
-						case "click":
-							bindClick(element, attr.value, model);
-							break;
-						case "enable":
-							bindEnable(element, attr.value, model, true);
-							break;
-						case "disable":
-							bindEnable(element, attr.value, model, false);
-							break;
-						case "visible":
-							bindVisible(element, attr.value, model, true);
-							break;
-						case "invisible":
-							bindVisible(element, attr.value, model, false);
-							break;
-						case "element":
-							model[attr.value] = element;
-							break;
-					}
-				}
-			}
+		for (var i=0; i<element.children.length; i++) {
+			parseElement(element.children[i], model);
+		}
 
-			for (var i=0; i<element.children.length; i++) {
-				parseElement(element.children[i], model);
+        if (model != vm) {
+            for (var key in model.$valueWatchers) {
+                model[key] = model.$valueWatchers[key].value;
+            }
+
+            for (var key in model.$enableWatchers) {
+                model[key] = model.$enableWatchers[key].value;
+            }
+
+            for (var key in model.$visibleWatchers) {
+                model[key] = model.$visibleWatchers[key].value;
+            }
+
+            if (model.$initializer) {
+                model.$initializer();
+            }
+        }
+	}
+
+	function parseAttribute(element, attr, model) {
+		if (attr.name.indexOf("vm-") == 0) {
+			var type = attr.name.slice(3);
+
+			switch (type) {
+				case "model":
+					//model = bindModel(element, attr.value);
+					break;
+				case "init":
+					bindInit(element, attr.value, model);
+					break;
+				case "value":
+					bindValue(element, attr.value, model);
+					break;
+				case "click":
+					bindClick(element, attr.value, model);
+					break;
+				case "enable":
+					bindEnable(element, attr.value, model, true);
+					break;
+				case "disable":
+					bindEnable(element, attr.value, model, false);
+					break;
+				case "visible":
+					bindVisible(element, attr.value, model, true);
+					break;
+				case "invisible":
+					bindVisible(element, attr.value, model, false);
+					break;
+				case "element":
+					model[attr.value] = element;
+					break;
 			}
 		}
 	}
 
-	function bindModel(element, modelName) {
+	function bindModel(modelName) {
 		thin.log("model" + modelName);
 
 		var model = thin.use(modelName, true);
@@ -119,16 +129,20 @@ thin.define("Component", ["AJAX", "DOMUtil"], function(AJAX, DOMHelper) {
 		element.onkeyup = function() {
 			vm[valueName] = element.value;
 		};
+
+		element.onpaste = function() {
+			vm[valueName] = element.value;
+		};
 	}
 
 	function bindInit(element, valueName, vm) {
 		thin.log("init" + vm);
 
-		queue.push((function(model) {
+        vm.$initializer = (function(model) {
 			return function() {
 				model[valueName]();
 			};
-		})(vm));
+		})(vm);
 	}
 
 	function bindClick(element, valueName, vm) {

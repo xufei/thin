@@ -6,8 +6,8 @@
 	<script type="text/javascript" src="../js/thin.js"></script>
 </head>
 <body>
-	<div id="areaDiv">
-		<form class="form-horizontal span6" vm-model="Area" vm-init="init">
+	<div id="PersonDiv">
+		<form class="form-horizontal span6" vm-model="Person" vm-init="init">
 			<div class="control-group">
 				<label class="control-label">Name</label>
 				<div class="controls">
@@ -15,15 +15,15 @@
 				</div>
 			</div>
 			<div class="control-group">
-				<label class="control-label">Code</label>
+				<label class="control-label">Age</label>
 				<div class="controls">
-					<input type="text" vm-value="code" placeholder="Code">
+					<input type="text" vm-value="age" placeholder="Age">
 				</div>
 			</div>
-			<input type="button" vm-click="myClick" value="Test"/>
+			<input type="button" vm-click="growUp" value="Grow up"/>
 		</form>
 
-		<form class="form-horizontal span6" vm-model="Area" vm-init="init">
+		<form class="form-horizontal span6" vm-model="Person" vm-init="init">
 			<div class="control-group">
 				<label class="control-label">Name</label>
 				<div class="controls">
@@ -31,50 +31,39 @@
 				</div>
 			</div>
 			<div class="control-group">
-				<label class="control-label">Code</label>
+				<label class="control-label">Age</label>
 				<div class="controls">
-					<input type="text" vm-value="code" placeholder="Code">
+					<input type="text" vm-value="age" placeholder="Age">
 				</div>
 			</div>
-			<input type="button" vm-click="myClick" value="Test"/>
+			<input type="button" vm-click="growUp" value="Grow up"/>
 		</form>
 	</div>
 	<script type="text/javascript">
-		thin.define("Area", [], function(vm) {
-			function Area() {
+		thin.define("Person", [], function(vm) {
+			function Person() {
 			}
 
-			Area.prototype = {
+			Person.prototype = {
 				init: function() {
-					this.name = "Test";
-					this.code = "abc";
+					this.name = "Tom";
+					this.age = 5;
 				},
 
-				myClick: function() {
-					this.code += "a";
+				growUp: function() {
+					this.age++;
 				}
 			};
 
-			return Area;
+			return Person;
 		});
-
-		/*
-		thin.ready(function() {
-			thin.require(["../js/modules/core/binding",
-			"../js/modules/core/remote",
-			"../js/modules/core/utils"], function() {
-				var component = thin.use("Component");
-				component.load("partial/form.html");
-			});
-		});
-		*/
 
 		thin.ready(function() {
 			thin.require(["../js/modules/core/binding",
 			"../js/modules/core/remote",
 			"../js/modules/core/utils"], function() {
 				var component = thin.use("Component");
-				component.parse(document.getElementById("areaDiv"));
+				component.parse(document.getElementById("PersonDiv"));
 			});
 		})
 	</script>
