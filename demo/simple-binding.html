@@ -1,52 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Component Demo</title>
+    <title>Simple binding demo</title>
 
-	<script type="text/javascript" src="../js/thin.js"></script>
+    <script type="text/javascript" src="../js/thin.js"></script>
 </head>
 <body>
-	<div id="PersonDiv">
-		<div vm-model="Person">
-			<input type="text" vm-value="name"/>
-			<input type="text" vm-value="age"/>
-			<input type="button" vm-click="growUp" value="Grow Up"/>
-		</div>
+<div id="PersonDiv">
+    <div vm-model="Person">
+        <input type="text" vm-value="name"/>
+        <input type="text" vm-value="age"/>
+        <input type="text" vm-value="age"/>
+        <input type="button" vm-click="growUp" value="Grow Up"/>
+    </div>
 
-		<div vm-model="Person" vm-init="init">
-			<input type="text" vm-value="name"/>
-			<input type="text" vm-value="age"/>
-			<input type="button" vm-click="growUp" value="Grow Up"/>
-		</div>
-	<script type="text/javascript">
-		thin.define("Person", [], function(vm) {
-			function Person() {
-				this.name = "Tom";
-				this.age = 5;
-			}
+    <div vm-model="Person" vm-init="init">
+        <input type="text" vm-value="name"/>
+        <input type="text" vm-value="age"/>
+        <input type="button" vm-click="growUp" value="Grow Up"/>
+    </div>
+</div>
+<script type="text/javascript">
+    thin.define("Person", [], function (vm) {
+        function Person() {
+            this.name = "Tom";
+            this.age = 5;
+        }
 
-			Person.prototype = {
-                init: function() {
-                    this.name = "Jerry";
-                    this.age = 3;
-                },
+        Person.prototype = {
+            init: function () {
+                this.name = "Jerry";
+                this.age = 3;
+            },
 
-				growUp: function() {
-					this.age++;
-				}
-			};
+            growUp: function () {
+                this.age++;
+            }
+        };
 
-			return Person;
-		});
-
-		thin.ready(function() {
-			thin.require(["../js/modules/core/binding",
-			"../js/modules/core/remote",
-			"../js/modules/core/utils"], function() {
-				var component = thin.use("Component");
-				component.parse(document.getElementById("PersonDiv"));
-			});
-		})
-	</script>
+        return Person;
+    });
+</script>
 </body>
 </html>

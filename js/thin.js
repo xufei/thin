@@ -22,8 +22,12 @@
 	var eventName = document.addEventListener ? "DOMContentLoaded" : "onreadystatechange";
 
 	addListener.call(document, eventName, function () {
-		for (var i = 0; i < readyFunctions.length; i++) {
-			readyFunctions[i]();
+		for (var i = readyFunctions.length; i>=0; i--) {
+            if (readyFunctions[i]) {
+                for (var j=0; j<readyFunctions[i].length; j++) {
+                    readyFunctions[i][j]();
+                }
+            }
 		}
 	}, false);
 
@@ -143,7 +147,13 @@
 			}
 		},
 
-		ready: function (handler) {
+		ready: function (handler, priority) {
+            priority = null ? 1 : priority;
+
+            if (!readyFunctions[priority]) {
+                readyFunctions[priority] = [];
+            }
+            readyFunctions[priority].push(handler);
 			readyFunctions.push(handler);
 		},
 
@@ -172,4 +182,11 @@
 
 		return EventBus;
 	});
+
+    thin.ready(function () {
+        thin.require(["../js/modules/core/binding"], function () {
+            var component = thin.use("Component");
+            component.parse(doc.body);
+        });
+    }, 0);
 })(document);
