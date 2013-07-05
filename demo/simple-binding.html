@@ -2,26 +2,23 @@
 <html>
 <head>
     <title>Simple binding demo</title>
-
     <script type="text/javascript" src="../js/thin.js"></script>
 </head>
 <body>
-<div id="PersonDiv">
-    <div vm-model="Person">
+    <div vm-model="test.Person">
         <input type="text" vm-value="name"/>
         <input type="text" vm-value="age"/>
         <input type="text" vm-value="age"/>
         <input type="button" vm-click="growUp" value="Grow Up"/>
     </div>
 
-    <div vm-model="Person" vm-init="init">
+    <div vm-model="test.Person" vm-init="init">
         <input type="text" vm-value="name"/>
         <input type="text" vm-value="age"/>
         <input type="button" vm-click="growUp" value="Grow Up"/>
     </div>
-</div>
 <script type="text/javascript">
-    thin.define("Person", [], function (vm) {
+    thin.define("test.Person", [], function (vm) {
         function Person() {
             this.name = "Tom";
             this.age = 5;
