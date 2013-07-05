@@ -1,29 +1,29 @@
 thin.define("Component", [], function () {
 	var Binder = {
 		$watch: function (key, watcher) {
-			if (!this.$valueWatchers[key]) {
-				this.$valueWatchers[key] = {
+			if (!this.$watchers[key]) {
+				this.$watchers[key] = {
 					value: this[key],
 					list: []
 				};
 
 				Object.defineProperty(this, key, {
 					set: function (val) {
-						var oldValue = this.$valueWatchers[key].value;
-						this.$valueWatchers[key].value = val;
+						var oldValue = this.$watchers[key].value;
+						this.$watchers[key].value = val;
 
-						for (var i = 0; i < this.$valueWatchers[key].list.length; i++) {
-							this.$valueWatchers[key].list[i](val, oldValue);
+						for (var i = 0; i < this.$watchers[key].list.length; i++) {
+							this.$watchers[key].list[i](val, oldValue);
 						}
 					},
 
 					get: function () {
-						return this.$valueWatchers[key].value;
+						return this.$watchers[key].value;
 					}
 				});
 			}
 
-			this.$valueWatchers[key].list.push(watcher);
+			this.$watchers[key].list.push(watcher);
 		}
 	};
 
@@ -45,16 +45,8 @@ thin.define("Component", [], function () {
 		}
 
 		if (model != vm) {
-			for (var key in model.$valueWatchers) {
-				model[key] = model.$valueWatchers[key].value;
-			}
-
-			for (var key in model.$enableWatchers) {
-				model[key] = model.$enableWatchers[key].value;
-			}
-
-			for (var key in model.$visibleWatchers) {
-				model[key] = model.$visibleWatchers[key].value;
+			for (var key in model.$watchers) {
+				model[key] = model.$watchers[key].value;
 			}
 
 			if (model.$initializer) {
@@ -99,20 +91,18 @@ thin.define("Component", [], function () {
 		}
 	}
 
-	function bindModel(modelName) {
-		thin.log("model" + modelName);
+	function bindModel(name) {
+		thin.log("binding model: " + name);
 
-		var model = thin.use(modelName, true);
+		var model = thin.use(name, true);
+		var instance = new model().extend(Binder);
+		instance.$watchers = {};
 
-		return new model().extend(Binder).extend({
-			$valueWatchers: {},
-			$enableWatchers: {},
-			$visibleWatchers: {}
-		});
+		return instance;
 	}
 
 	function bindValue(element, key, vm) {
-		thin.log("value" + vm);
+		thin.log("binding value: " + key);
 
 		vm.$watch(key, function (value, oldValue) {
 			element.value = value || "";
@@ -127,83 +117,37 @@ thin.define("Component", [], function () {
 		};
 	}
 
-	function bindInit(element, valueName, vm) {
-		thin.log("init" + vm);
+	function bindInit(element, key, vm) {
+		thin.log("binding init: " + key);
 
 		vm.$initializer = (function (model) {
 			return function () {
-				model[valueName]();
+				model[key]();
 			};
 		})(vm);
 	}
 
-	function bindClick(element, valueName, vm) {
-		thin.log("click" + vm);
+	function bindClick(element, key, vm) {
+		thin.log("binding click: " + key);
 
 		element.onclick = function () {
-			vm[valueName]();
+			vm[key]();
 		}
 	}
 
-	function bindEnable(element, valueName, vm, direction) {
-		thin.log("enable" + vm);
+	function bindEnable(element, key, vm, direction) {
+		thin.log("binding enable: " + key);
 
-		if (!vm.$enableWatchers[valueName]) {
-			vm.$enableWatchers[valueName] = {
-				value: vm[valueName],
-				list: []
-			};
-
-			Object.defineProperty(vm, valueName, {
-				set: function (val) {
-					this.$enableWatchers[valueName].value = val;
-
-					for (var i = 0; i < vm.$enableWatchers[valueName].list.length; i++) {
-						var item = vm.$enableWatchers[valueName].list[i];
-						item.element.disabled = val ^ item.direction ? true : false;
-					}
-				},
-
-				get: function () {
-					return this.$enableWatchers[valueName].value;
-				}
-			});
-		}
-
-		vm.$enableWatchers[valueName].list.push({
-			element: element,
-			direction: direction
+		vm.$watch(key, function (value, oldValue) {
+			element.disabled = value ^ direction ? true : false;
 		});
 	}
 
-	function bindVisible(element, valueName, vm, direction) {
-		thin.log("visible" + vm);
+	function bindVisible(element, key, vm, direction) {
+		thin.log("binding visible: " + key);
 
-		if (!vm.$visibleWatchers[valueName]) {
-			vm.$visibleWatchers[valueName] = {
-				value: vm[valueName],
-				list: []
-			};
-
-			Object.defineProperty(vm, valueName, {
-				set: function (val) {
-					for (var i = 0; i < vm.$visibleWatchers[valueName].list.length; i++) {
-						this.$visibleWatchers[valueName].value = val;
-
-						var item = vm.$visibleWatchers[valueName].list[i];
-						item.element.style.display = val ^ item.direction ? "none" : "";
-					}
-				},
-
-				get: function () {
-					return this.$visibleWatchers[valueName].value;
-				}
-			});
-		}
-
-		vm.$visibleWatchers[valueName].list.push({
-			element: element,
-			direction: direction
+		vm.$watch(key, function (value, oldValue) {
+			element.style.display = value ^ direction ? "none" : "";
 		});
 	}
 
