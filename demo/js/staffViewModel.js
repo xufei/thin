@@ -1,5 +1,5 @@
 
-thin.define("StaffViewModel", ["DataGrid"], function(DataGrid, vm) {
+thin.define("StaffViewModel", ["DataGrid"], function(DataGrid) {
 	function StaffViewModel() {
         this.state = "View";
         this.enableForm = false;
