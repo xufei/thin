@@ -1,6 +1,5 @@
-
-thin.define("Tree", ["Observer"], function(Observer) {
-	var Tree = function(element) {
+thin.define("Tree", ["Observer"], function (Observer) {
+	var Tree = function (element) {
 		this.allNodes = [];
 		this.nodes = [];
 
@@ -19,18 +18,18 @@ thin.define("Tree", ["Observer"], function(Observer) {
 	};
 
 	Tree.prototype = {
-		loadTreeData : function(data, keyField) {
+		loadTreeData: function (data, keyField) {
 			this.clear();
 
 			this.keyField = keyField;
 
-			for (var i=0; i<data.length; i++) {
+			for (var i = 0; i < data.length; i++) {
 				this.addNode(data[i]);
 			}
 			this.data = data;
 		},
 
-		loadListData : function(data, selfField, parentField, topFlag) {
+		loadListData: function (data, selfField, parentField, topFlag) {
 			var tree = [];
 			var dict = {};
 
@@ -64,19 +63,19 @@ thin.define("Tree", ["Observer"], function(Observer) {
 			this.loadTreeData(tree, selfField);
 		},
 
-		expandAll : function() {
-			for (var i=0; i<this.allNodes.length; i++) {
+		expandAll: function () {
+			for (var i = 0; i < this.allNodes.length; i++) {
 				this.allNodes[i].expand();
 			}
 		},
 
-		collapseAll : function() {
-			for (var i=0; i<this.allNodes.length; i++) {
+		collapseAll: function () {
+			for (var i = 0; i < this.allNodes.length; i++) {
 				this.allNodes[i].collapse();
 			}
 		},
 
-		findNode : function(key, value) {
+		findNode: function (key, value) {
 			var result;
 			for (var i = 0; i < this.allNodes.length; i++) {
 				var node = this.allNodes[i];
@@ -89,7 +88,7 @@ thin.define("Tree", ["Observer"], function(Observer) {
 			return result;
 		},
 
-		addNode : function(data, parent) {
+		addNode: function (data, parent) {
 			var node;
 
 			if (parent) {
@@ -136,7 +135,7 @@ thin.define("Tree", ["Observer"], function(Observer) {
 			this.fire(event);
 		},
 
-		removeNode : function(node) {
+		removeNode: function (node) {
 			node.clear();
 
 			if (node == this.selectedNode) {
@@ -146,7 +145,7 @@ thin.define("Tree", ["Observer"], function(Observer) {
 			if (node.parent == this) {
 				this.dom.removeChild(node.dom);
 
-				for (var i=0; i<this.nodes.length; i++) {
+				for (var i = 0; i < this.nodes.length; i++) {
 					if (this.nodes[i] == node) {
 						this.nodes.splice(i, 1);
 						break;
@@ -155,7 +154,7 @@ thin.define("Tree", ["Observer"], function(Observer) {
 			}
 			else {
 				node.parent.childrenContainer.removeChild(node.dom);
-				for (var i=0; i<node.parent.childNodes.length; i++) {
+				for (var i = 0; i < node.parent.childNodes.length; i++) {
 					if (node.parent.childNodes[i] == node) {
 						node.parent.childNodes.splice(i, 1);
 						break;
@@ -180,11 +179,11 @@ thin.define("Tree", ["Observer"], function(Observer) {
 			this.fire(event);
 		},
 
-		swapNodes : function(node1, node2) {
+		swapNodes: function (node1, node2) {
 
 		},
 
-		selectNode: function(node) {
+		selectNode: function (node) {
 			var event = {
 				type: "changed",
 				oldNode: this.selectedNode,
@@ -204,16 +203,16 @@ thin.define("Tree", ["Observer"], function(Observer) {
 			this.fire(event);
 		},
 
-		clear : function() {
+		clear: function () {
 
 		},
 
-		destroy: function() {
+		destroy: function () {
 
 		}
 	}.extend(Observer);
 
-	var TreeNode = function(data, parent) {
+	var TreeNode = function (data, parent) {
 		this.data = data;
 		this.parent = parent;
 		this.tree = parent.tree;
@@ -223,7 +222,7 @@ thin.define("Tree", ["Observer"], function(Observer) {
 	};
 
 	TreeNode.prototype = {
-		create: function() {
+		create: function () {
 			this.dom = document.createElement("li");
 			this.iconContainer = document.createElement("i");
 
@@ -237,7 +236,7 @@ thin.define("Tree", ["Observer"], function(Observer) {
 			this.dom.appendChild(this.childrenContainer);
 
 			if (this.data.children) {
-				for (var i=0; i<this.data.children.length; i++) {
+				for (var i = 0; i < this.data.children.length; i++) {
 					this.addNode(this.data.children[i]);
 				}
 			}
@@ -248,7 +247,7 @@ thin.define("Tree", ["Observer"], function(Observer) {
 
 			function bindEvent(node) {
 				//expand
-				node.iconContainer.onclick = function() {
+				node.iconContainer.onclick = function () {
 					var event = {
 						type: "expanded",
 						expanded: node.expanded,
@@ -260,7 +259,7 @@ thin.define("Tree", ["Observer"], function(Observer) {
 				};
 
 				//select
-				node.labelContainer.onclick = function() {
+				node.labelContainer.onclick = function () {
 					var event = {
 						type: "selected",
 						node: node,
@@ -271,7 +270,7 @@ thin.define("Tree", ["Observer"], function(Observer) {
 				};
 
 				//contextmenu
-				node.dom.oncontextmenu = function(e) {
+				node.dom.oncontextmenu = function (e) {
 					var event = {
 						type: "rightClicked",
 						node: node,
@@ -280,7 +279,7 @@ thin.define("Tree", ["Observer"], function(Observer) {
 
 					node.fire(event);
 
-					if ( e && e.stopPropagation )
+					if (e && e.stopPropagation)
 					//因此它支持W3C的stopPropagation()方法
 						e.stopPropagation();
 					else
@@ -288,7 +287,7 @@ thin.define("Tree", ["Observer"], function(Observer) {
 						window.event.cancelBubble = true;
 
 					//阻止默认浏览器动作(W3C)
-					if ( e && e.preventDefault )
+					if (e && e.preventDefault)
 						e.preventDefault();
 					//IE中阻止函数器默认动作的方式
 					else
@@ -298,13 +297,13 @@ thin.define("Tree", ["Observer"], function(Observer) {
 			}
 		},
 
-		clear: function() {
+		clear: function () {
 			while (this.childNodes.length > 0) {
 				this.removeNode(this.childNodes[0]);
 			}
 		},
 
-		destroy: function() {
+		destroy: function () {
 			this.data = null;
 			this.parent = null;
 			this.tree = null;
@@ -316,39 +315,39 @@ thin.define("Tree", ["Observer"], function(Observer) {
 			this.dom = null;
 		},
 
-		addNode: function(data) {
+		addNode: function (data) {
 			this.tree.addNode(data, this);
 		},
 
-		removeNode: function(node) {
+		removeNode: function (node) {
 			this.childrenContainer.removeChild(node.dom);
 
-			for (var i=0; i<this.childNodes.length; i++) {
+			for (var i = 0; i < this.childNodes.length; i++) {
 				if (this.childNodes[i] == node) {
 					this.childNodes.splice(i, 1);
 				}
 			}
 
-			for (var i=0; i<this.tree.allNodes.length; i++) {
+			for (var i = 0; i < this.tree.allNodes.length; i++) {
 				if (this.tree.allNodes[i] == node) {
 					this.tree.allNodes.splice(i, 1);
 				}
 			}
 		},
 
-		expand: function() {
+		expand: function () {
 			this.childrenContainer.hidden = false;
 			this.expanded = true;
 			this.refreshIcon();
 		},
 
-		collapse: function() {
+		collapse: function () {
 			this.childrenContainer.hidden = true;
 			this.expanded = false;
 			this.refreshIcon();
 		},
 
-		select: function(flag) {
+		select: function (flag) {
 			if (flag) {
 				this.dom.className = "info";
 			}
@@ -357,11 +356,11 @@ thin.define("Tree", ["Observer"], function(Observer) {
 			}
 		},
 
-		refreshData: function(data) {
+		refreshData: function (data) {
 			this.labelContainer.innerHTML = data[this.tree.labelField || "label"];
 		},
 
-		refreshIcon: function() {
+		refreshIcon: function () {
 			if (this.expanded) {
 				this.iconContainer.className = "icon-minus";
 			}

@@ -137,8 +137,8 @@ thin.module("jqLite", ["Utils"], function (Utils) {
 							fireEvent = !fireEvent;
 						}
 						for (childIndex = 0, childLength = (children = element.children()).length;
-							 childIndex < childLength;
-							 childIndex++) {
+						     childIndex < childLength;
+						     childIndex++) {
 							list.push(jQuery(children[childIndex]));
 						}
 					}

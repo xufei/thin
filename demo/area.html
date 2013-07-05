@@ -27,12 +27,14 @@
 			<form class="form-horizontal span6">
 				<div class="control-group">
 					<label class="control-label" for="inputName">Name</label>
+
 					<div class="controls">
 						<input type="text" id="inputName" placeholder="Name">
 					</div>
 				</div>
 				<div class="control-group">
 					<label class="control-label" for="inputCode">Code</label>
+
 					<div class="controls">
 						<input type="text" id="inputCode" placeholder="Code">
 					</div>
@@ -54,8 +56,8 @@
 	</div>
 </div>
 <script type="text/javascript">
-	thin.ready(function() {
-		thin.require(["../js/modules/controls/tree", "js/areaManage"], function() {
+	thin.ready(function () {
+		thin.require(["../js/modules/controls/tree", "js/areaManage"], function () {
 			var areaManage = thin.use("AreaManage");
 			areaManage.init();
 		});

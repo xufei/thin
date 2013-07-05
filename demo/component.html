@@ -6,66 +6,70 @@
 	<script type="text/javascript" src="../js/thin.js"></script>
 </head>
 <body>
-	<div id="PersonDiv">
-		<form class="form-horizontal span6" vm-model="Person" vm-init="init">
-			<div class="control-group">
-				<label class="control-label">Name</label>
-				<div class="controls">
-					<input type="text" vm-value="name" placeholder="Name">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">Age</label>
-				<div class="controls">
-					<input type="text" vm-value="age" placeholder="Age">
-				</div>
-			</div>
-			<input type="button" vm-click="growUp" value="Grow up"/>
-		</form>
+<div id="PersonDiv">
+	<form class="form-horizontal span6" vm-model="Person" vm-init="init">
+		<div class="control-group">
+			<label class="control-label">Name</label>
 
-		<form class="form-horizontal span6" vm-model="Person" vm-init="init">
-			<div class="control-group">
-				<label class="control-label">Name</label>
-				<div class="controls">
-					<input type="text" vm-value="name" placeholder="Name">
-				</div>
+			<div class="controls">
+				<input type="text" vm-value="name" placeholder="Name">
 			</div>
-			<div class="control-group">
-				<label class="control-label">Age</label>
-				<div class="controls">
-					<input type="text" vm-value="age" placeholder="Age">
-				</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">Age</label>
+
+			<div class="controls">
+				<input type="text" vm-value="age" placeholder="Age">
 			</div>
-			<input type="button" vm-click="growUp" value="Grow up"/>
-		</form>
-	</div>
-	<script type="text/javascript">
-		thin.define("Person", [], function(vm) {
-			function Person() {
+		</div>
+		<input type="button" vm-click="growUp" value="Grow up"/>
+	</form>
+
+	<form class="form-horizontal span6" vm-model="Person" vm-init="init">
+		<div class="control-group">
+			<label class="control-label">Name</label>
+
+			<div class="controls">
+				<input type="text" vm-value="name" placeholder="Name">
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">Age</label>
+
+			<div class="controls">
+				<input type="text" vm-value="age" placeholder="Age">
+			</div>
+		</div>
+		<input type="button" vm-click="growUp" value="Grow up"/>
+	</form>
+</div>
+<script type="text/javascript">
+	thin.define("Person", [], function (vm) {
+		function Person() {
+		}
+
+		Person.prototype = {
+			init: function () {
+				this.name = "Tom";
+				this.age = 5;
+			},
+
+			growUp: function () {
+				this.age++;
 			}
+		};
 
-			Person.prototype = {
-				init: function() {
-					this.name = "Tom";
-					this.age = 5;
-				},
+		return Person;
+	});
 
-				growUp: function() {
-					this.age++;
-				}
-			};
-
-			return Person;
-		});
-
-		thin.ready(function() {
-			thin.require(["../js/modules/core/binding",
+	thin.ready(function () {
+		thin.require(["../js/modules/core/binding",
 			"../js/modules/core/remote",
-			"../js/modules/core/utils"], function() {
-				var component = thin.use("Component");
-				component.parse(document.getElementById("PersonDiv"));
-			});
-		})
-	</script>
+			"../js/modules/core/utils"], function () {
+			var component = thin.use("Component");
+			component.parse(document.getElementById("PersonDiv"));
+		});
+	})
+</script>
 </body>
 </html>

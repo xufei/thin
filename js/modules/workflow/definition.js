@@ -1,9 +1,8 @@
-
-thin.define("Workflow", [], function() {
+thin.define("Workflow", [], function () {
 
 });
 
-thin.define("Activity", [], function() {
+thin.define("Activity", [], function () {
 	function Activity(data) {
 
 	}
@@ -12,7 +11,7 @@ thin.define("Activity", [], function() {
 });
 
 
-thin.define("Transition", ["Condition"], function(Condition) {
+thin.define("Transition", ["Condition"], function (Condition) {
 	function Transition(data) {
 		this.condition = new Condition();
 	}
@@ -20,7 +19,7 @@ thin.define("Transition", ["Condition"], function(Condition) {
 	return Transition;
 });
 
-thin.define("Condition", [], function() {
+thin.define("Condition", [], function () {
 	function Condition(expression) {
 		this.expression = expression;
 	}
@@ -28,25 +27,25 @@ thin.define("Condition", [], function() {
 	return Condition;
 });
 
-thin.define("SequentialFlow", ["Activity"], function(Activity) {
+thin.define("SequentialFlow", ["Activity"], function (Activity) {
 	function SequentialFlow() {
 
 	}
 
 	SequentialFlow.prototype = {
-		load: function(data) {
+		load: function (data) {
 
 		},
 
-		clear: function() {
+		clear: function () {
 
 		},
 
-		addActivity: function(data) {
+		addActivity: function (data) {
 
 		},
 
-		addTransition: function(data, from, to) {
+		addTransition: function (data, from, to) {
 
 		}
 	};
@@ -54,7 +53,7 @@ thin.define("SequentialFlow", ["Activity"], function(Activity) {
 	return SequentialFlow;
 });
 
-thin.define("StateMachine", ["Activity", "Transition"], function(Activity, Transition) {
+thin.define("StateMachine", ["Activity", "Transition"], function (Activity, Transition) {
 
 	function StateMachine() {
 		this.activities = [];
@@ -65,25 +64,25 @@ thin.define("StateMachine", ["Activity", "Transition"], function(Activity, Trans
 	}
 
 	StateMachine.prototype = {
-		load: function(data) {
+		load: function (data) {
 
 		},
 
-		clear: function() {
+		clear: function () {
 			this.activities = [];
 			this.transitions = [];
 
 			this.currentActivity = null;
 		},
 
-		addActivity: function(data) {
+		addActivity: function (data) {
 			var activity = new Activity(data);
 			activity.flow = this;
 
 			this.activities.push(activity);
 		},
 
-		addTransition: function(data, from, to) {
+		addTransition: function (data, from, to) {
 			var transition = new Transition(data);
 			transition.from = from;
 			transition.to = to;

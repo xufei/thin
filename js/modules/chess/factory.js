@@ -1,5 +1,3 @@
-
-
 thin.define("ChessFactory", ["ChessType", "ChessColor", "General", "Guard", "Staff", "Horse", "Chariot", "Cannon", "Soldier"], function (ChessType, ChessColor, General) {
 	var ChessConstructors = [].slice.call(arguments).slice(2);
 

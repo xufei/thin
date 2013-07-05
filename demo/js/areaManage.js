@@ -1,4 +1,4 @@
-thin.define("AreaManage", ["Tree"], function(Tree) {
+thin.define("AreaManage", ["Tree"], function (Tree) {
 
 	var state = "View";
 
@@ -59,7 +59,7 @@ thin.define("AreaManage", ["Tree"], function(Tree) {
 		tree.loadTreeData(data);
 	}
 
-	document.getElementById("newBtn").onclick = function() {
+	document.getElementById("newBtn").onclick = function () {
 		state = "New";
 		switchButtons("Confirm");
 		enableForm(true);
@@ -67,19 +67,19 @@ thin.define("AreaManage", ["Tree"], function(Tree) {
 		setFormData({});
 	}
 
-	document.getElementById("modifyBtn").onclick = function() {
+	document.getElementById("modifyBtn").onclick = function () {
 		state = "Modify";
 		switchButtons("Confirm");
 		enableForm(true);
 	}
 
-	document.getElementById("deleteBtn").onclick = function() {
+	document.getElementById("deleteBtn").onclick = function () {
 		if (confirm("Sure?")) {
 			tree.removeNode(tree.selectedNode);
 		}
 	}
 
-	document.getElementById("okBtn").onclick = function() {
+	document.getElementById("okBtn").onclick = function () {
 		var data = getFormData();
 
 		if (state === "New") {
@@ -93,7 +93,7 @@ thin.define("AreaManage", ["Tree"], function(Tree) {
 		enableForm(false);
 	}
 
-	document.getElementById("cancelBtn").onclick = function() {
+	document.getElementById("cancelBtn").onclick = function () {
 		state = "View";
 		switchButtons("Operate");
 		enableForm(false);

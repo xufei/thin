@@ -5,7 +5,7 @@
 	};
 
 	var thin = {
-		define: function(name, dependencies, factory) {
+		define: function (name, dependencies, factory) {
 			if (!moduleMap[name]) {
 				var module = {
 					name: name,
@@ -19,12 +19,12 @@
 			return moduleMap[name];
 		},
 
-		use: function(name) {
+		use: function (name) {
 			var module = moduleMap[name];
 
 			if (!module.entity) {
 				var args = [];
-				for (var i=0; i<module.dependencies.length; i++) {
+				for (var i = 0; i < module.dependencies.length; i++) {
 					if (moduleMap[module.dependencies[i]].entity) {
 						args.push(moduleMap[module.dependencies[i]].entity);
 					}

@@ -1,4 +1,3 @@
-
-thin.define("WorkflowEngine", ["Observer"], function(Observer) {
+thin.define("WorkflowEngine", ["Observer"], function (Observer) {
 
 });

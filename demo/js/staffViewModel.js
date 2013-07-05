@@ -1,24 +1,23 @@
-
-thin.define("StaffViewModel", ["DataGrid"], function(DataGrid) {
+thin.define("StaffViewModel", ["DataGrid"], function (DataGrid) {
 	function StaffViewModel() {
-        this.state = "View";
-        this.enableForm = false;
-        this.editing = false;
+		this.state = "View";
+		this.enableForm = false;
+		this.editing = false;
 	}
 
 	StaffViewModel.prototype = {
-		init: function() {
+		init: function () {
 			var that = this;
 
 			var grid = new DataGrid(this.staffGrid);
 
-			grid.on("loadCompleted", function(event) {
+			grid.on("loadCompleted", function (event) {
 				if (event.target.rows.length > 0) {
 					event.target.select(event.target.rows[0]);
 				}
 			});
 
-			grid.on("changed", function(event) {
+			grid.on("changed", function (event) {
 				var data;
 				if (event.newRow) {
 					data = event.newRow.data;
@@ -30,11 +29,11 @@ thin.define("StaffViewModel", ["DataGrid"], function(DataGrid) {
 				that.setFormData(data);
 			});
 
-			grid.on("rowInserted", function(event) {
+			grid.on("rowInserted", function (event) {
 				event.target.select(event.newRow);
 			});
 
-			grid.on("rowRemoved", function(event) {
+			grid.on("rowRemoved", function (event) {
 				if (event.target.rows.length > 0) {
 					event.target.select(event.target.rows[0]);
 				}
@@ -42,42 +41,51 @@ thin.define("StaffViewModel", ["DataGrid"], function(DataGrid) {
 
 			this.grid = grid;
 
-			var columns = [{
-				label: "#",
-				field: "index"
-			}, {
-				label: "Name",
-				field: "name"
-			}, {
-				label: "Gender",
-				field: "gender"
-			}, {
-				label: "Age",
-				field: "age"
-			}];
+			var columns = [
+				{
+					label: "#",
+					field: "index"
+				},
+				{
+					label: "Name",
+					field: "name"
+				},
+				{
+					label: "Gender",
+					field: "gender"
+				},
+				{
+					label: "Age",
+					field: "age"
+				}
+			];
 
-			var data = [{
-				index: 1,
-				name: "Tom",
-				gender: "Male",
-				age: 5
-			}, {
-				index: 2,
-				name: "Jerry",
-				gender: "Female",
-				age: 2
-			}, {
-				index: 3,
-				name: "Sun Wukong",
-				gender: "Male",
-				age: 1024
-			}];
+			var data = [
+				{
+					index: 1,
+					name: "Tom",
+					gender: "Male",
+					age: 5
+				},
+				{
+					index: 2,
+					name: "Jerry",
+					gender: "Female",
+					age: 2
+				},
+				{
+					index: 3,
+					name: "Sun Wukong",
+					gender: "Male",
+					age: 1024
+				}
+			];
 
 			this.grid.loadColumns(columns);
 			this.grid.loadData(data);
 		},
 
-		newClick: function() {
+		newClick: function () {
 			this.state = "New";
 			this.editing = true;
 			this.enableForm = true;
@@ -85,19 +93,19 @@ thin.define("StaffViewModel", ["DataGrid"], function(DataGrid) {
 			this.setFormData({});
 		},
 
-		modifyClick: function() {
+		modifyClick: function () {
 			this.state = "Modify";
 			this.editing = true;
 			this.enableForm = true;
 		},
 
-		deleteClick: function() {
+		deleteClick: function () {
 			if (confirm("Sure?")) {
 				this.grid.removeRow(this.grid.selectedRow);
 			}
 		},
 
-		okClick: function() {
+		okClick: function () {
 			var data = this.getFormData();
 
 			if (this.state === "New") {
@@ -111,7 +119,7 @@ thin.define("StaffViewModel", ["DataGrid"], function(DataGrid) {
 			this.enableForm = false;
 		},
 
-		cancelClick: function() {
+		cancelClick: function () {
 			this.state = "View";
 			this.editing = false;
 			this.enableForm = false;
@@ -119,7 +127,7 @@ thin.define("StaffViewModel", ["DataGrid"], function(DataGrid) {
 			this.setFormData(this.grid.selectedRow.data);
 		},
 
-		getFormData: function() {
+		getFormData: function () {
 			return {
 				index: this.index,
 				name: this.name,
@@ -128,7 +136,7 @@ thin.define("StaffViewModel", ["DataGrid"], function(DataGrid) {
 			};
 		},
 
-		setFormData: function(data) {
+		setFormData: function (data) {
 			this.index = data.index;
 			this.name = data.name;
 			this.gender = data.gender;

@@ -1,4 +1,3 @@
-
 thin.define("ChessMan", [], function () {
 	function ChessMan(color, type) {
 		this.color = color;

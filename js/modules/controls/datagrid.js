@@ -1,7 +1,6 @@
-
-thin.define("DataGrid", ["Observer"], function(Observer) {
+thin.define("DataGrid", ["Observer"], function (Observer) {
 	//作为一个控件，它的容器必须传入
-	var DataGrid = function(element) {
+	var DataGrid = function (element) {
 		this.columns = [];
 		this.rows = [];
 
@@ -105,7 +104,7 @@ thin.define("DataGrid", ["Observer"], function(Observer) {
 		}
 	}.extend(Observer);
 
-	var DataRow = function(data, grid) {
+	var DataRow = function (data, grid) {
 		this.data = data;
 		this.grid = grid;
 

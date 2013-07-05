@@ -1,33 +1,31 @@
+thin.define("Component", [], function () {
+	var Binder = {
+		$watch: function (key, watcher) {
+			if (!this.$valueWatchers[key]) {
+				this.$valueWatchers[key] = {
+					value: this[key],
+					list: []
+				};
 
+				Object.defineProperty(this, key, {
+					set: function (val) {
+						var oldValue = this.$valueWatchers[key].value;
+						this.$valueWatchers[key].value = val;
 
-thin.define("Component", [], function() {
-    var Binder = {
-        $watch: function(key, watcher) {
-            if (!this.$valueWatchers[key]) {
-                this.$valueWatchers[key] = {
-                    value: this[key],
-                    list: []
-                };
+						for (var i = 0; i < this.$valueWatchers[key].list.length; i++) {
+							this.$valueWatchers[key].list[i](val, oldValue);
+						}
+					},
 
-                Object.defineProperty(this, key, {
-                    set: function(val) {
-                        var oldValue = this.$valueWatchers[key].value;
-                        this.$valueWatchers[key].value = val;
+					get: function () {
+						return this.$valueWatchers[key].value;
+					}
+				});
+			}
 
-                        for (var i=0; i<this.$valueWatchers[key].list.length; i++) {
-                            this.$valueWatchers[key].list[i](val, oldValue);
-                        }
-                    },
-
-                    get: function() {
-                        return this.$valueWatchers[key].value;
-                    }
-                });
-            }
-
-            this.$valueWatchers[key].list.push(watcher);
-        }
-    };
+			this.$valueWatchers[key].list.push(watcher);
+		}
+	};
 
 	var vmMap = {};
 
@@ -38,31 +36,31 @@ thin.define("Component", [], function() {
 			model = bindModel(element.getAttribute("vm-model"));
 		}
 
-		for (var i=0; i<element.attributes.length; i++) {
+		for (var i = 0; i < element.attributes.length; i++) {
 			parseAttribute(element, element.attributes[i], model);
 		}
 
-		for (var i=0; i<element.children.length; i++) {
+		for (var i = 0; i < element.children.length; i++) {
 			parseElement(element.children[i], model);
 		}
 
-        if (model != vm) {
-            for (var key in model.$valueWatchers) {
-                model[key] = model.$valueWatchers[key].value;
-            }
+		if (model != vm) {
+			for (var key in model.$valueWatchers) {
+				model[key] = model.$valueWatchers[key].value;
+			}
 
-            for (var key in model.$enableWatchers) {
-                model[key] = model.$enableWatchers[key].value;
-            }
+			for (var key in model.$enableWatchers) {
+				model[key] = model.$enableWatchers[key].value;
+			}
 
-            for (var key in model.$visibleWatchers) {
-                model[key] = model.$visibleWatchers[key].value;
-            }
+			for (var key in model.$visibleWatchers) {
+				model[key] = model.$visibleWatchers[key].value;
+			}
 
-            if (model.$initializer) {
-                model.$initializer();
-            }
-        }
+			if (model.$initializer) {
+				model.$initializer();
+			}
+		}
 	}
 
 	function parseAttribute(element, attr, model) {
@@ -107,24 +105,24 @@ thin.define("Component", [], function() {
 		var model = thin.use(modelName, true);
 
 		return new model().extend(Binder).extend({
-            $valueWatchers: {},
-            $enableWatchers: {},
-            $visibleWatchers: {}
-        });
+			$valueWatchers: {},
+			$enableWatchers: {},
+			$visibleWatchers: {}
+		});
 	}
 
 	function bindValue(element, key, vm) {
 		thin.log("value" + vm);
 
-        vm.$watch(key, function(value, oldValue) {
-            element.value = value || "";
-        });
+		vm.$watch(key, function (value, oldValue) {
+			element.value = value || "";
+		});
 
-		element.onkeyup = function() {
+		element.onkeyup = function () {
 			vm[key] = element.value;
 		};
 
-		element.onpaste = function() {
+		element.onpaste = function () {
 			vm[key] = element.value;
 		};
 	}
@@ -132,8 +130,8 @@ thin.define("Component", [], function() {
 	function bindInit(element, valueName, vm) {
 		thin.log("init" + vm);
 
-        vm.$initializer = (function(model) {
-			return function() {
+		vm.$initializer = (function (model) {
+			return function () {
 				model[valueName]();
 			};
 		})(vm);
@@ -142,7 +140,7 @@ thin.define("Component", [], function() {
 	function bindClick(element, valueName, vm) {
 		thin.log("click" + vm);
 
-		element.onclick = function() {
+		element.onclick = function () {
 			vm[valueName]();
 		}
 	}
@@ -157,16 +155,16 @@ thin.define("Component", [], function() {
 			};
 
 			Object.defineProperty(vm, valueName, {
-				set: function(val) {
+				set: function (val) {
 					this.$enableWatchers[valueName].value = val;
 
-					for (var i=0; i<vm.$enableWatchers[valueName].list.length; i++) {
+					for (var i = 0; i < vm.$enableWatchers[valueName].list.length; i++) {
 						var item = vm.$enableWatchers[valueName].list[i];
 						item.element.disabled = val ^ item.direction ? true : false;
 					}
 				},
 
-				get: function() {
+				get: function () {
 					return this.$enableWatchers[valueName].value;
 				}
 			});
@@ -188,8 +186,8 @@ thin.define("Component", [], function() {
 			};
 
 			Object.defineProperty(vm, valueName, {
-				set: function(val) {
-					for (var i=0; i<vm.$visibleWatchers[valueName].list.length; i++) {
+				set: function (val) {
+					for (var i = 0; i < vm.$visibleWatchers[valueName].list.length; i++) {
 						this.$visibleWatchers[valueName].value = val;
 
 						var item = vm.$visibleWatchers[valueName].list[i];
@@ -197,7 +195,7 @@ thin.define("Component", [], function() {
 					}
 				},
 
-				get: function() {
+				get: function () {
 					return this.$visibleWatchers[valueName].value;
 				}
 			});
@@ -211,5 +209,5 @@ thin.define("Component", [], function() {
 
 	return {
 		parse: parseElement
-    }
+	}
 });

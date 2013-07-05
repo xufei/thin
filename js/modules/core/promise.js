@@ -1,8 +1,7 @@
-
 /**
  * Promise
  */
-thin.module("Promise", [], function() {
+thin.module("Promise", [], function () {
 
 	var defer = function () {
 		var pending = [];

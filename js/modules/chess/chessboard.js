@@ -1,5 +1,3 @@
-
-
 thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"], function (Config, ChessText, ChessColor, ChessService) {
 	var offsetX = Config.offsetX;
 	var offsetY = Config.offsetY;
@@ -231,9 +229,9 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 			attackArr = [];
 		},
 
-		clearAll: function() {
-			for (var i=0; i<chesses.length; i++) {
-				for (var j=0; j<chesses[i].length; j++) {
+		clearAll: function () {
+			for (var i = 0; i < chesses.length; i++) {
+				for (var j = 0; j < chesses[i].length; j++) {
 					chesses[i][j].label.remove();
 					chesses[i][j].group.remove();
 				}

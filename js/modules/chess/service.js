@@ -1,4 +1,3 @@
-
 thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, ChessColor) {
 	var situation;
 	var observer = {};

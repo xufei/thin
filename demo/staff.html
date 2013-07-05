@@ -25,12 +25,14 @@
 			<form class="form-horizontal span6">
 				<div class="control-group">
 					<label class="control-label" for="inputIndex">Index</label>
+
 					<div class="controls">
 						<input type="text" id="inputIndex" placeholder="Index">
 					</div>
 				</div>
 				<div class="control-group">
 					<label class="control-label" for="inputGender">Gender</label>
+
 					<div class="controls">
 						<input type="text" id="inputGender" placeholder="Gender">
 					</div>
@@ -39,12 +41,14 @@
 			<form class="form-horizontal span6">
 				<div class="control-group">
 					<label class="control-label" for="inputName">Name</label>
+
 					<div class="controls">
 						<input type="text" id="inputName" placeholder="Name">
 					</div>
 				</div>
 				<div class="control-group">
 					<label class="control-label" for="inputAge">Age</label>
+
 					<div class="controls">
 						<input type="text" id="inputAge" placeholder="age">
 					</div>
@@ -66,8 +70,8 @@
 </div>
 
 <script type="text/javascript">
-	thin.ready(function() {
-		thin.require(["../js/modules/controls/datagrid", "js/staffManage"], function() {
+	thin.ready(function () {
+		thin.require(["../js/modules/controls/datagrid", "js/staffManage"], function () {
 			var staffManage = thin.use("StaffManage");
 			staffManage.init();
 		});

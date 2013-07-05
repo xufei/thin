@@ -1,5 +1,4 @@
-
-thin.define("Utils", [], function() {
+thin.define("Utils", [], function () {
 	function uuid() {
 		return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
 			var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -7,23 +6,51 @@ thin.define("Utils", [], function() {
 		});
 	};
 
-	var lowercase = function(string){return isString(string) ? string.toLowerCase() : string;};
-	var uppercase = function(string){return isString(string) ? string.toUpperCase() : string;};
+	var lowercase = function (string) {
+		return isString(string) ? string.toLowerCase() : string;
+	};
+	var uppercase = function (string) {
+		return isString(string) ? string.toUpperCase() : string;
+	};
 
-	function isUndefined(value){return typeof value == 'undefined';}
-	function isDefined(value){return typeof value != 'undefined';}
+	function isUndefined(value) {
+		return typeof value == 'undefined';
+	}
 
-	function isObject(value){return value != null && typeof value == 'object';}
-	function isString(value){return typeof value == 'string';}
-	function isNumber(value){return typeof value == 'number';}
-	function isBoolean(value){return typeof value == 'boolean';}
-	function isDate(value){return toString.apply(value) == '[object Date]';}
-	function isArray(value) {return toString.apply(value) == '[object Array]';}
-	function isFunction(value){return typeof value == 'function';}
+	function isDefined(value) {
+		return typeof value != 'undefined';
+	}
+
+	function isObject(value) {
+		return value != null && typeof value == 'object';
+	}
+
+	function isString(value) {
+		return typeof value == 'string';
+	}
+
+	function isNumber(value) {
+		return typeof value == 'number';
+	}
+
+	function isBoolean(value) {
+		return typeof value == 'boolean';
+	}
+
+	function isDate(value) {
+		return toString.apply(value) == '[object Date]';
+	}
+
+	function isArray(value) {
+		return toString.apply(value) == '[object Array]';
+	}
+
+	function isFunction(value) {
+		return typeof value == 'function';
+	}
 
 
-
-	function copy(source, destination){
+	function copy(source, destination) {
 		if (isWindow(source) || isScope(source)) {
 			throw ngMinErr('cpws', "Can't copy! Making copies of Window or Scope instances is not supported.");
 		}
@@ -43,18 +70,18 @@ thin.define("Utils", [], function() {
 			if (source === destination) throw ngMinErr('cpi', "Can't copy! Source and destination are identical.");
 			if (isArray(source)) {
 				destination.length = 0;
-				for ( var i = 0; i < source.length; i++) {
+				for (var i = 0; i < source.length; i++) {
 					destination.push(copy(source[i]));
 				}
 			} else {
 				var h = destination.$$hashKey;
-				forEach(destination, function(value, key){
+				forEach(destination, function (value, key) {
 					delete destination[key];
 				});
-				for ( var key in source) {
+				for (var key in source) {
 					destination[key] = copy(source[key]);
 				}
-				setHashKey(destination,h);
+				setHashKey(destination, h);
 			}
 		}
 		return destination;
@@ -63,7 +90,7 @@ thin.define("Utils", [], function() {
 	function shallowCopy(src, dst) {
 		dst = dst || {};
 
-		for(var key in src) {
+		for (var key in src) {
 			if (src.hasOwnProperty(key) && key.substr(0, 2) !== '$$') {
 				dst[key] = src[key];
 			}
@@ -81,7 +108,7 @@ thin.define("Utils", [], function() {
 			if (t1 == 'object') {
 				if (isArray(o1)) {
 					if ((length = o1.length) == o2.length) {
-						for(key=0; key<length; key++) {
+						for (key = 0; key < length; key++) {
 							if (!equals(o1[key], o2[key])) return false;
 						}
 						return true;
@@ -91,16 +118,15 @@ thin.define("Utils", [], function() {
 				} else {
 					if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2)) return false;
 					keySet = {};
-					for(key in o1) {
+					for (key in o1) {
 						if (key.charAt(0) === '$' || isFunction(o1[key])) continue;
 						if (!equals(o1[key], o2[key])) return false;
 						keySet[key] = true;
 					}
-					for(key in o2) {
+					for (key in o2) {
 						if (!keySet[key] &&
 							key.charAt(0) !== '$' &&
-							o2[key] !== undefined &&
-							!isFunction(o2[key])) return false;
+							o2[key] !== undefined && !isFunction(o2[key])) return false;
 					}
 					return true;
 				}
@@ -109,9 +135,9 @@ thin.define("Utils", [], function() {
 		return false;
 	}
 
-	function makeMap(str){
+	function makeMap(str) {
 		var obj = {}, items = str.split(","), i;
-		for ( i = 0; i < items.length; i++ )
+		for (i = 0; i < items.length; i++)
 			obj[ items[i] ] = true;
 		return obj;
 	}
@@ -125,7 +151,7 @@ thin.define("Utils", [], function() {
 	function forEach(obj, iterator, context) {
 		var key;
 		if (obj) {
-			if (isFunction(obj)){
+			if (isFunction(obj)) {
 				for (key in obj) {
 					if (key != 'prototype' && key != 'length' && key != 'name' && obj.hasOwnProperty(key)) {
 						iterator.call(context, obj[key], key);
@@ -166,7 +192,7 @@ thin.define("Utils", [], function() {
 	};
 });
 
-thin.define("DOMUtil", [], function() {
+thin.define("DOMUtil", [], function () {
 	function create() {
 		return document.createElement;
 	}

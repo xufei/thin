@@ -22,12 +22,12 @@
 	var eventName = document.addEventListener ? "DOMContentLoaded" : "onreadystatechange";
 
 	addListener.call(document, eventName, function () {
-		for (var i = readyFunctions.length; i>=0; i--) {
-            if (readyFunctions[i]) {
-                for (var j=0; j<readyFunctions[i].length; j++) {
-                    readyFunctions[i][j]();
-                }
-            }
+		for (var i = readyFunctions.length; i >= 0; i--) {
+			if (readyFunctions[i]) {
+				for (var j = 0; j < readyFunctions[i].length; j++) {
+					readyFunctions[i][j]();
+				}
+			}
 		}
 	}, false);
 
@@ -88,7 +88,7 @@
 			return moduleMap[name];
 		},
 
-		use: function (name, isViewModel) {
+		use: function (name) {
 			var module = moduleMap[name];
 
 			if (!module.entity) {
@@ -100,10 +100,6 @@
 					else {
 						args.push(this.use(module.dependencies[i]));
 					}
-				}
-
-				if (isViewModel) {
-					args.push({}.extend(Observer));
 				}
 
 				module.entity = module.factory.apply(noop, args);
@@ -148,12 +144,12 @@
 		},
 
 		ready: function (handler, priority) {
-            priority = null ? 1 : priority;
+			priority = null ? 1 : priority;
 
-            if (!readyFunctions[priority]) {
-                readyFunctions[priority] = [];
-            }
-            readyFunctions[priority].push(handler);
+			if (!readyFunctions[priority]) {
+				readyFunctions[priority] = [];
+			}
+			readyFunctions[priority].push(handler);
 			readyFunctions.push(handler);
 		},
 
@@ -162,12 +158,12 @@
 		},
 
 		log: function (obj) {
-            try {
-                console.log(obj);
-            }
-            catch (ex) {
+			try {
+				console.log(obj);
+			}
+			catch (ex) {
 
-            }
+			}
 		}
 	});
 
@@ -183,10 +179,10 @@
 		return EventBus;
 	});
 
-    thin.ready(function () {
-        thin.require(["../js/modules/core/binding"], function () {
-            var component = thin.use("Component");
-            component.parse(doc.body);
-        });
-    }, 0);
+	thin.ready(function () {
+		thin.require(["../js/modules/core/binding"], function () {
+			var component = thin.use("Component");
+			component.parse(doc.body);
+		});
+	}, 0);
 })(document);

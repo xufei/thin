@@ -17,7 +17,7 @@ thin.define("AJAX", [], function () {
 
 	function getURL(url, callback) {
 		var xhr = new XHR();
-		xhr.onreadystatechange = function() {
+		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
 				if (xhr.status == 200) {
 					callback(xhr.responseText);

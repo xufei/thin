@@ -1,16 +1,15 @@
-
-thin.define("StaffManage", ["DataGrid"], function(DataGrid) {
+thin.define("StaffManage", ["DataGrid"], function (DataGrid) {
 	var state = "View";
 
 	var grid = new DataGrid(document.getElementById("grid1"));
 
-	grid.on("loadCompleted", function(event) {
+	grid.on("loadCompleted", function (event) {
 		if (event.target.rows.length > 0) {
 			event.target.select(event.target.rows[0]);
 		}
 	});
 
-	grid.on("changed", function(event) {
+	grid.on("changed", function (event) {
 		var data;
 		if (event.newRow) {
 			data = event.newRow.data;
@@ -22,11 +21,11 @@ thin.define("StaffManage", ["DataGrid"], function(DataGrid) {
 		setFormData(data);
 	});
 
-	grid.on("rowInserted", function(event) {
+	grid.on("rowInserted", function (event) {
 		event.target.select(event.newRow);
 	});
 
-	grid.on("rowRemoved", function(event) {
+	grid.on("rowRemoved", function (event) {
 		if (event.target.rows.length > 0) {
 			event.target.select(event.target.rows[0]);
 		}
@@ -36,36 +35,45 @@ thin.define("StaffManage", ["DataGrid"], function(DataGrid) {
 		enableForm(false);
 		switchButtons("Operate");
 
-		var columns = [{
-			label: "#",
-			field: "index"
-		}, {
-			label: "Name",
-			field: "name"
-		}, {
-			label: "Gender",
-			field: "gender"
-		}, {
-			label: "Age",
-			field: "age"
-		}];
+		var columns = [
+			{
+				label: "#",
+				field: "index"
+			},
+			{
+				label: "Name",
+				field: "name"
+			},
+			{
+				label: "Gender",
+				field: "gender"
+			},
+			{
+				label: "Age",
+				field: "age"
+			}
+		];
 
-		var data = [{
-			index: 1,
-			name: "Tom",
-			gender: "Male",
-			age: 5
-		}, {
-			index: 2,
-			name: "Jerry",
-			gender: "Female",
-			age: 2
-		}, {
-			index: 3,
-			name: "Sun Wukong",
-			gender: "Male",
-			age: 1024
-		}];
+		var data = [
+			{
+				index: 1,
+				name: "Tom",
+				gender: "Male",
+				age: 5
+			},
+			{
+				index: 2,
+				name: "Jerry",
+				gender: "Female",
+				age: 2
+			},
+			{
+				index: 3,
+				name: "Sun Wukong",
+				gender: "Male",
+				age: 1024
+			}
+		];
 
 		grid.loadColumns(columns);
 		grid.loadData(data);
@@ -73,7 +81,7 @@ thin.define("StaffManage", ["DataGrid"], function(DataGrid) {
 
 
 	//add event handler
-	document.getElementById("newBtn").onclick = function() {
+	document.getElementById("newBtn").onclick = function () {
 		state = "New";
 		switchButtons("Confirm");
 		enableForm(true);
@@ -81,19 +89,19 @@ thin.define("StaffManage", ["DataGrid"], function(DataGrid) {
 		setFormData({});
 	};
 
-	document.getElementById("modifyBtn").onclick = function() {
+	document.getElementById("modifyBtn").onclick = function () {
 		state = "Modify";
 		switchButtons("Confirm");
 		enableForm(true);
 	}
 
-	document.getElementById("deleteBtn").onclick = function() {
+	document.getElementById("deleteBtn").onclick = function () {
 		if (confirm("Sure?")) {
 			grid.removeRow(grid.selectedRow);
 		}
 	}
 
-	document.getElementById("okBtn").onclick = function() {
+	document.getElementById("okBtn").onclick = function () {
 		var data = getFormData();
 
 		if (state === "New") {
@@ -107,7 +115,7 @@ thin.define("StaffManage", ["DataGrid"], function(DataGrid) {
 		enableForm(false);
 	}
 
-	document.getElementById("cancelBtn").onclick = function() {
+	document.getElementById("cancelBtn").onclick = function () {
 		state = "View";
 		switchButtons("Operate");
 		enableForm(false);

@@ -1,42 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simple binding demo</title>
-    <script type="text/javascript" src="../js/thin.js"></script>
+	<title>Simple binding demo</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="binding">
+	<meta name="author" content="xu.fei@outlook.com">
+	<script type="text/javascript" src="../js/thin.js"></script>
 </head>
 <body>
-    <div vm-model="test.Person">
-        <input type="text" vm-value="name"/>
-        <input type="text" vm-value="age"/>
-        <input type="text" vm-value="age"/>
-        <input type="button" vm-click="growUp" value="Grow Up"/>
-    </div>
+<div vm-model="test.Person">
+	<input type="text" vm-value="name"/>
+	<input type="text" vm-value="age"/>
+	<input type="text" vm-value="age"/>
+	<input type="button" vm-click="growUp" value="Grow Up"/>
+</div>
 
-    <div vm-model="test.Person" vm-init="init">
-        <input type="text" vm-value="name"/>
-        <input type="text" vm-value="age"/>
-        <input type="button" vm-click="growUp" value="Grow Up"/>
-    </div>
+<div vm-model="test.Person" vm-init="init">
+	<input type="text" vm-value="name"/>
+	<input type="text" vm-value="age"/>
+	<input type="button" vm-click="growUp" value="Grow Up"/>
+</div>
 <script type="text/javascript">
-    thin.define("test.Person", [], function () {
-        function Person() {
-            this.name = "Tom";
-            this.age = 5;
-        }
+	thin.define("test.Person", [], function () {
+		function Person() {
+			this.name = "Tom";
+			this.age = 5;
+		}
 
-        Person.prototype = {
-            init: function () {
-                this.name = "Jerry";
-                this.age = 3;
-            },
+		Person.prototype = {
+			init: function () {
+				this.name = "Jerry";
+				this.age = 3;
+			},
 
-            growUp: function () {
-                this.age++;
-            }
-        };
+			growUp: function () {
+				this.age++;
+			}
+		};
 
-        return Person;
-    });
+		return Person;
+	});
 </script>
 </body>
 </html>
