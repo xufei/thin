@@ -181,8 +181,8 @@
 
 	thin.ready(function () {
 		thin.require(["../js/modules/core/binding"], function () {
-			var component = thin.use("Component");
-			component.parse(doc.body);
+			var binding = thin.use("DOMBinding");
+			binding.parse(doc.body);
 		});
 	}, 0);
 })(document);

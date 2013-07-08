@@ -1,4 +1,4 @@
-<form class="form-horizontal span6" vm-model="Area">
+<form class="form-horizontal span6" vm-model="Person" vm-init="init">
 	<div class="control-group">
 		<label class="control-label">Name</label>
 
@@ -7,10 +7,11 @@
 		</div>
 	</div>
 	<div class="control-group">
-		<label class="control-label">Code</label>
+		<label class="control-label">Age</label>
 
 		<div class="controls">
-			<input type="text" vm-value="code" placeholder="Code">
+			<input type="text" vm-value="age" placeholder="Age">
 		</div>
 	</div>
+	<input type="button" vm-click="growUp" value="Grow up"/>
 </form>

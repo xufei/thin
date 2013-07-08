@@ -6,43 +6,8 @@
 	<script type="text/javascript" src="../js/thin.js"></script>
 </head>
 <body>
-<div id="PersonDiv">
-	<form class="form-horizontal span6" vm-model="Person" vm-init="init">
-		<div class="control-group">
-			<label class="control-label">Name</label>
-
-			<div class="controls">
-				<input type="text" vm-value="name" placeholder="Name">
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">Age</label>
-
-			<div class="controls">
-				<input type="text" vm-value="age" placeholder="Age">
-			</div>
-		</div>
-		<input type="button" vm-click="growUp" value="Grow up"/>
-	</form>
-
-	<form class="form-horizontal span6" vm-model="Person" vm-init="init">
-		<div class="control-group">
-			<label class="control-label">Name</label>
-
-			<div class="controls">
-				<input type="text" vm-value="name" placeholder="Name">
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">Age</label>
-
-			<div class="controls">
-				<input type="text" vm-value="age" placeholder="Age">
-			</div>
-		</div>
-		<input type="button" vm-click="growUp" value="Grow up"/>
-	</form>
-</div>
+	load component
+	<div></div>
 <script type="text/javascript">
 	thin.define("Person", [], function (vm) {
 		function Person() {
@@ -67,7 +32,7 @@
 			"../js/modules/core/remote",
 			"../js/modules/core/utils"], function () {
 			var component = thin.use("Component");
-			component.parse(document.getElementById("PersonDiv"));
+			component.load("partial/form.html");
 		});
 	})
 </script>
