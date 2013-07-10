@@ -74,9 +74,6 @@ thin.define("DOMBinding", [], function () {
 			var type = attr.name.slice(3);
 
 			switch (type) {
-				case "model":
-					//model = bindModel(element, attr.value);
-					break;
 				case "init":
 					bindInit(element, attr.value, model);
 					break;
