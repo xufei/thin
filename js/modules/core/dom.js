@@ -1,35 +1,50 @@
-thin.define("DOMSelector", ["Observer"], function(Observer) {
+thin.define("DOMSelector", [], function() {
 	function DOM() {
 		this.elements = [];
 		this.eventMap = [];
 	}
 
 	DOM.prototype = {
-		attr: function() {
-			this.elements.forEach(function(element) {
+		attr: function(key, value) {
+			if (arguments.length == 2) {
+				this.elements.forEach(function(element) {
+					element.setAttribute(key, value);
+				});
+				return this;
+			}
+			else if (arguments.length == 1) {
+				if (this.elements.length > 0) {
+					return this.elements[0].getAttribute(key);
+				}
+			}
+		},
 
+		addClass: function(className) {
+			this.elements.forEach(function(element) {
+				element.classList.add(className);
 			});
 			return this;
 		},
 
-		addClass: function(className) {
-
-		},
-
 		removeClass: function(className) {
-
+			this.elements.forEach(function(element) {
+				element.classList.remove(className);
+			});
+			return this;
 		},
 
 		show: function() {
 			this.elements.forEach(function(element) {
 				element.style.display = "";
 			});
+			return this;
 		},
 
 		hide: function() {
 			this.elements.forEach(function(element) {
 				element.style.display = "none";
 			});
+			return this;
 		},
 
 		on: function(eventType, handler) {
@@ -38,6 +53,7 @@ thin.define("DOMSelector", ["Observer"], function(Observer) {
 					this.click(handler);
 					break;
 			}
+			return this;
 		},
 
 		off: function(eventType, handler) {
@@ -48,6 +64,7 @@ thin.define("DOMSelector", ["Observer"], function(Observer) {
 			this.elements.forEach(function(element) {
 				thin.on.call(element, "click", handler);
 			});
+			return this;
 		}
 	};
 
