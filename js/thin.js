@@ -153,6 +153,10 @@
 			readyFunctions.push(handler);
 		},
 
+		on: addListener,
+
+		off: removeListener,
+
 		error: function () {
 
 		},

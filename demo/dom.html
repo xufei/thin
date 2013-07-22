@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>DOM Operation</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Chinese Chess">
+	<meta name="author" content="xu.fei@outlook.com">
+	<script type="text/javascript" src="../js/thin.js"></script>
+</head>
+<body>
+<div id="container">
+	<div id="test">aaaa</div>
+
+	<div>
+		<input name="testRadio"/>
+		<input name="testRadio"/>
+		<input name="testRadio"/>
+	</div>
+
+	<button id="showBtn">Show</button>
+
+	<button id="hideBtn">Hide</button>
+</div>
+
+<script type="text/javascript">
+	thin.require(["../js/modules/core/dom"], function () {
+		var DOMSelector = thin.use("DOMSelector");
+
+		DOMSelector.byId("showBtn").on("click", function() {
+			DOMSelector.byId("test").show();
+			DOMSelector.byName("testRadio").show();
+		});
+
+		DOMSelector.byId("hideBtn").on("click", function() {
+			DOMSelector.byId("test").hide();
+			DOMSelector.byName("testRadio").hide();
+		});
+	});
+</script>
+</body>
+</html>

@@ -1,7 +1,7 @@
-thin.define("DOMSelector", [], function() {
-
+thin.define("DOMSelector", ["Observer"], function(Observer) {
 	function DOM() {
 		this.elements = [];
+		this.eventMap = [];
 	}
 
 	DOM.prototype = {
@@ -20,12 +20,34 @@ thin.define("DOMSelector", [], function() {
 
 		},
 
-		on: function() {
+		show: function() {
+			this.elements.forEach(function(element) {
+				element.style.display = "";
+			});
+		},
+
+		hide: function() {
+			this.elements.forEach(function(element) {
+				element.style.display = "none";
+			});
+		},
+
+		on: function(eventType, handler) {
+			switch (eventType) {
+				case "click":
+					this.click(handler);
+					break;
+			}
+		},
+
+		off: function(eventType, handler) {
 
 		},
 
-		off: function() {
-			
+		click: function(handler) {
+			this.elements.forEach(function(element) {
+				thin.on.call(element, "click", handler);
+			});
 		}
 	};
 
@@ -38,10 +60,18 @@ thin.define("DOMSelector", [], function() {
 		},
 
 		byName: function(name) {
-
+			var dom = new DOM();
+			dom.elements = [].slice.call(document.getElementsByName(name));
+			return dom;
 		},
 
 		byTagName: function(tagName) {
+			var dom = new DOM();
+			dom.elements = [].slice.call(document.getElementsByTagName(tagName));
+			return dom;
+		},
+
+		bySelector: function(selector) {
 
 		}
 	};
