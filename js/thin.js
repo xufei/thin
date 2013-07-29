@@ -22,7 +22,7 @@
 	var eventName = document.addEventListener ? "DOMContentLoaded" : "onreadystatechange";
 
 	addListener.call(document, eventName, function () {
-		for (var i = readyFunctions.length; i >= 0; i--) {
+		for (var i = readyFunctions.length - 1; i >= 0; i--) {
 			if (readyFunctions[i]) {
 				for (var j = 0; j < readyFunctions[i].length; j++) {
 					readyFunctions[i][j]();
@@ -150,7 +150,6 @@
 				readyFunctions[priority] = [];
 			}
 			readyFunctions[priority].push(handler);
-			readyFunctions.push(handler);
 		},
 
 		on: addListener,

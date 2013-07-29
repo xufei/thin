@@ -6,10 +6,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="Chinese Chess">
 	<meta name="author" content="xu.fei@outlook.com">
-	<script type="text/javascript" src="../../js/thin.js"></script>
-	<script type="text/javascript" src="../../libs/raphael-min.js"></script>
+	<script type="text/javascript" src="../js/thin.js"></script>
+	<script type="text/javascript" src="../libs/raphael-min.js"></script>
 </head>
 <body>
+<button id="undoBtn">undo</button>
+<button id="redoBtn">redo</button>
 <div id="chessContainer"></div>
 
 <script type="text/javascript">
@@ -22,8 +24,12 @@
 			"../js/modules/chess/controller"], function () {
 			var chessController = thin.use("ChessController");
 			chessController.init(document.getElementById("chessContainer"));
+
+			document.getElementById("undoBtn").onclick = function() {
+
+			};
 		});
-	});
+	}, 1);
 </script>
 </body>
 </html>

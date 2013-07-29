@@ -17,14 +17,19 @@ thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, Ch
 			}
 
 			for (var i = 0; i < data.length; i++) {
-				var chess = this.factory.createChess(data[i]);
-
-				situation[chess.x][chess.y] = chess;
+				this.create(data[i]);
 			}
 
 			currentColor = ChessColor.RED;
 			undoList = [];
 			redoList = [];
+		},
+
+		create: function(data) {
+			var chess = this.factory.createChess(data);
+			situation[chess.x][chess.y] = chess;
+
+			return chess;
 		},
 
 		click: function (handler) {
@@ -82,6 +87,24 @@ thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, Ch
 							}
 						};
 						this.dispatch(event);
+
+						var step = {
+							color: chess.color,
+							type: chess.type,
+							from: {
+								x: currentChess.x,
+								y: currentChess.y
+							},
+							to: {
+								x: chess.x,
+								y: chess.y
+							},
+							enemy: {
+
+							}
+						};
+
+						undoList.push(step);
 
 						if (chess.type == ChessType.GENERAL) {
 							var winColor = (chess.color == ChessColor.RED) ? "黑" : "红";
@@ -158,6 +181,21 @@ thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, Ch
 				}
 			};
 			this.dispatch(event);
+
+			var step = {
+				color: currentChess.color,
+				type: currentChess.type,
+				from: {
+					x: currentChess.x,
+					y: currentChess.y
+				},
+				to: {
+					x: x,
+					y: y
+				}
+			};
+
+			undoList.push(step);
 		},
 
 		isFriendly: function (color, x, y) {
@@ -177,6 +215,7 @@ thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, Ch
 
 		moveTo: function (oldX, oldY, newX, newY) {
 			var chess = situation[oldX][oldY];
+
 			situation[oldX][oldY] = null;
 			chess.x = newX;
 			chess.y = newY;
@@ -184,6 +223,25 @@ thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, Ch
 
 			currentColor = ChessColor.RED + ChessColor.BLACK - currentColor;
 			currentChess = null;
+		},
+
+		undo: function() {
+			if (undoList.length > 0) {
+				var step = undoList.pop();
+
+				var event = {
+					type: "move",
+					from: {
+						x: currentChess.x,
+						y: currentChess.y
+					},
+					to: {
+						x: x,
+						y: y
+					}
+				};
+				this.dispatch(event);
+			}
 		}
 	};
 

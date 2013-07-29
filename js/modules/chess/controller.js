@@ -1,4 +1,4 @@
-thin.define("ChessController", ["ChessBoard", "ChessFactory", "ChessService", "ChessColor"], function (ChessBoard, ChessFactory, ChessService, ChessColor) {
+thin.define("ChessController", ["ChessBoard", "ChessFactory", "ChessService"], function (ChessBoard, ChessFactory, ChessService) {
 	//color, type, x, y
 	var chesses = [
 		[1, 7, 4, 9],
@@ -77,6 +77,10 @@ thin.define("ChessController", ["ChessBoard", "ChessFactory", "ChessService", "C
 			ChessService.init(chesses);
 			ChessBoard.drawBoard(element);
 			ChessBoard.drawChess();
+		},
+
+		undo: function() {
+			ChessService.undo();
 		}
 	};
 });
