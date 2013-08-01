@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<title>Staff Management with binding</title>
 	<meta charset="utf-8">
-	<title>Staff Management</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="DataGrid">
+	<meta name="description" content="DataGrid, binding">
 	<meta name="author" content="xu.fei@outlook.com">
 
-	<link href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css" rel="stylesheet"/>
+	<link href="../css/bootstrap.min.css" rel="stylesheet"/>
 	<script type="text/javascript" src="../js/thin.js"></script>
 </head>
 <body>
-<div class="span12">
+<div class="span12" vm-model="StaffViewModel" vm-init="init">
 	<div class="header">
-		<h3>Staff Management</h3>
+		<h3>Staff Management with binding</h3>
 	</div>
 	<div>
-		<div id="grid1" class="row"></div>
+		<div class="row" vm-element="staffGrid"></div>
 		<div class="row">
 			<div class="header">
 				<h4>Detail</h4>
@@ -27,14 +27,14 @@
 					<label class="control-label" for="inputIndex">Index</label>
 
 					<div class="controls">
-						<input type="text" id="inputIndex" placeholder="Index">
+						<input type="text" id="inputIndex" placeholder="Index" vm-value="index" vm-enable="enableForm"/>
 					</div>
 				</div>
 				<div class="control-group">
-					<label class="control-label" for="inputGender">Gender</label>
+					<label class="control-label" for="genderSelect">Gender</label>
 
 					<div class="controls">
-						<input type="text" id="inputGender" placeholder="Gender">
+						<select id="genderSelect" vm-list="genderArr" vm-value="gender" vm-enable="enableForm"></select>
 					</div>
 				</div>
 			</form>
@@ -43,39 +43,35 @@
 					<label class="control-label" for="inputName">Name</label>
 
 					<div class="controls">
-						<input type="text" id="inputName" placeholder="Name">
+						<input type="text" id="inputName" placeholder="Name" vm-value="name" vm-enable="enableForm"/>
 					</div>
 				</div>
 				<div class="control-group">
 					<label class="control-label" for="inputAge">Age</label>
 
 					<div class="controls">
-						<input type="text" id="inputAge" placeholder="age">
+						<input type="text" id="inputAge" placeholder="age" vm-value="age" vm-enable="enableForm"/>
 					</div>
 				</div>
 			</form>
 		</div>
 	</div>
 	<div class="modal-footer">
-		<div id="operateBtns">
-			<button id="newBtn" class="btn btn-primary">New</button>
-			<button id="modifyBtn" class="btn btn-primary"><i class="icon-edit icon-white"></i>Modify</button>
-			<button id="deleteBtn" class="btn btn-primary"><i class="icon-remove icon-white"></i>Delete</button>
+		<div vm-invisible="editing">
+			<button class="btn btn-primary" vm-click="newClick">New</button>
+			<button class="btn btn-primary" vm-click="modifyClick"><i class="icon-edit icon-white"></i>Modify</button>
+			<button class="btn btn-primary" vm-click="deleteClick"><i class="icon-remove icon-white"></i>Delete</button>
 		</div>
-		<div id="confirmBtns">
-			<button id="okBtn" class="btn btn-primary"><i class="icon-ok icon-white"></i>OK</button>
-			<button id="cancelBtn" class="btn btn-primary">Cancel</button>
+		<div vm-visible="editing">
+			<button class="btn btn-primary" vm-click="okClick"><i class="icon-ok icon-white"></i>OK</button>
+			<button class="btn btn-primary" vm-click="cancelClick">Cancel</button>
 		</div>
 	</div>
 </div>
 
 <script type="text/javascript">
-	thin.ready(function () {
-		thin.require(["../js/modules/controls/datagrid", "js/staffManage"], function () {
-			var staffManage = thin.use("StaffManage");
-			staffManage.init();
-		});
-	});
+	thin.require(["controls/datagrid", "role/vm/staffViewModel"]);
 </script>
+
 </body>
 </html>

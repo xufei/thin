@@ -6,7 +6,6 @@ thin.define("Component", ["AJAX"], function(AJAX) {
 		});
 	}
 
-
 	return {
 		load: load
 	};
@@ -80,6 +79,9 @@ thin.define("DOMBinding", [], function () {
 				case "value":
 					bindValue(element, attr.value, model);
 					break;
+				case "list":
+					bindList(element, attr.value, model);
+					break;
 				case "click":
 					bindClick(element, attr.value, model);
 					break;
@@ -105,7 +107,7 @@ thin.define("DOMBinding", [], function () {
 	function bindModel(name) {
 		thin.log("binding model: " + name);
 
-		var model = thin.use(name, true);
+		var model = thin.use(name);
 		var instance = new model().extend(Binder);
 		instance.$watchers = {};
 
@@ -126,6 +128,24 @@ thin.define("DOMBinding", [], function () {
 		element.onpaste = function () {
 			vm[key] = element.value;
 		};
+	}
+
+	function bindList(element, key, vm) {
+		thin.log("binding list: " + key);
+
+		vm.$watch(key, function (value, oldValue) {
+			var selectedValue = element.value;
+			element.innerHTML = null;
+
+			for (var i=0; i<value.length; i++) {
+				var item = document.createElement("option");
+				item.innerHTML = value[i].label;
+				item.value = value[i].key;
+
+				element.appendChild(item);
+			}
+			element.value = selectedValue;
+		});
 	}
 
 	function bindInit(element, key, vm) {

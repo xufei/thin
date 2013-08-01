@@ -3,6 +3,14 @@ thin.define("StaffViewModel", ["DataGrid"], function (DataGrid) {
 		this.state = "View";
 		this.enableForm = false;
 		this.editing = false;
+
+		this.genderArr = [{
+			key: "0",
+			label: "Female"
+		}, {
+			key: "1",
+			label: "Male"
+		}];
 	}
 
 	StaffViewModel.prototype = {
@@ -64,19 +72,19 @@ thin.define("StaffViewModel", ["DataGrid"], function (DataGrid) {
 				{
 					index: 1,
 					name: "Tom",
-					gender: "Male",
+					gender: "1",
 					age: 5
 				},
 				{
 					index: 2,
 					name: "Jerry",
-					gender: "Female",
+					gender: "0",
 					age: 2
 				},
 				{
 					index: 3,
 					name: "Sun Wukong",
-					gender: "Male",
+					gender: "1",
 					age: 1024
 				}
 			];

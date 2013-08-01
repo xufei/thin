@@ -74,6 +74,8 @@
 	};
 
 	window.thin = thin.extend({
+		base: "../js/modules/",
+
 		define: function (name, dependencies, factory) {
 			if (!moduleMap[name]) {
 				var module = {
@@ -109,6 +111,7 @@
 		},
 
 		require: function (pathArr, callback) {
+		    var base = this.base;
 			for (var i = 0; i < pathArr.length; i++) {
 				loadFile(pathArr[i]);
 			}
@@ -117,11 +120,11 @@
 				var head = document.getElementsByTagName('head')[0];
 				var script = document.createElement('script');
 				script.setAttribute('type', 'text/javascript');
-				script.setAttribute('src', file + '.js');
+				script.setAttribute('src', base + file + '.js');
 				script.onload = script.onreadystatechange = function () {
 					if ((!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
 						fileMap[file] = true;
-						head.removeChild(script);
+						//head.removeChild(script);
 						checkAllFiles();
 					}
 				};
@@ -137,14 +140,14 @@
 					}
 				}
 
-				if (allLoaded) {
+				if (allLoaded && callback) {
 					callback();
 				}
 			}
 		},
 
 		ready: function (handler, priority) {
-			priority = null ? 1 : priority;
+			priority = (priority == null) ? 1 : priority;
 
 			if (!readyFunctions[priority]) {
 				readyFunctions[priority] = [];
@@ -183,7 +186,7 @@
 	});
 
 	thin.ready(function () {
-		thin.require(["../js/modules/core/binding"], function () {
+		thin.require(["core/binding"], function () {
 			var binding = thin.use("DOMBinding");
 			binding.parse(doc.body);
 		});
