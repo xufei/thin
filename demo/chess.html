@@ -16,12 +16,12 @@
 
 <script type="text/javascript">
 	thin.ready(function () {
-		thin.require(["../js/modules/chess/config",
-			"../js/modules/chess/service",
-			"../js/modules/chess/chessman",
-			"../js/modules/chess/factory",
-			"../js/modules/chess/chessboard",
-			"../js/modules/chess/controller"], function () {
+		thin.require(["chess/config",
+			"chess/service",
+			"chess/chessman",
+			"chess/factory",
+			"chess/chessboard",
+			"chess/controller"], function () {
 			var chessController = thin.use("ChessController");
 			chessController.init(document.getElementById("chessContainer"));
 
