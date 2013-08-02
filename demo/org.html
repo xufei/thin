@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Staff Management with binding</title>
+	<title>Org Management with binding</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="DataGrid, binding">
+	<meta name="description" content="TreeGrid, binding">
 	<meta name="author" content="xu.fei@outlook.com">
 
 	<link rel="stylesheet" href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css"/>
+	<script type="text/javascript" src="../libs/underscore-min.js"></script>
 	<script type="text/javascript" src="../js/thin.js"></script>
 </head>
 <body>
-<div class="span12" vm-model="StaffViewModel" vm-init="init">
+<div class="span12" vm-model="OrgViewModel" vm-init="init">
 	<div class="header">
-		<h3>Staff Management with binding</h3>
+		<h3>Org Management with binding</h3>
 	</div>
 	<div>
-		<div class="row" vm-element="staffGrid"></div>
+		<div class="row" vm-element="orgGrid"></div>
 		<div class="row">
 			<div class="header">
 				<h4>Detail</h4>
@@ -70,7 +71,7 @@
 </div>
 
 <script type="text/javascript">
-	thin.require(["controls/datagrid", "role/vm/staffViewModel"]);
+	thin.require(["controls/treegrid", "role/vm/orgViewModel"]);
 </script>
 
 </body>

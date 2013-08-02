@@ -1,7 +1,7 @@
 thin.define("Tree", ["Observer"], function (Observer) {
 	var Tree = function (element) {
 		this.allNodes = [];
-		this.nodes = [];
+		this.childNodes = [];
 
 		this.keyField = null;
 		this.nodeDict = {};
@@ -12,9 +12,9 @@ thin.define("Tree", ["Observer"], function (Observer) {
 		this.tree = this;
 		this.labelField = null;
 
-		this.dom = document.createElement("ul");
-		this.dom.className = "tree";
-		element.appendChild(this.dom);
+		this.childrenContainer = document.createElement("ul");
+		this.childrenContainer.className = "tree";
+		element.appendChild(this.childrenContainer);
 	};
 
 	Tree.prototype = {
@@ -89,18 +89,11 @@ thin.define("Tree", ["Observer"], function (Observer) {
 		},
 
 		addNode: function (data, parent) {
-			var node;
+			parent = parent || this;
 
-			if (parent) {
-				node = new TreeNode(data, parent);
-				parent.childNodes.push(node);
-				parent.childrenContainer.appendChild(node.dom);
-			}
-			else {
-				node = new TreeNode(data, this);
-				this.nodes.push(node);
-				this.dom.appendChild(node.dom);
-			}
+			var node = new TreeNode(data, parent);
+			parent.childNodes.push(node);
+			parent.childrenContainer.appendChild(node.dom);
 
 			this.allNodes.push(node);
 
@@ -143,7 +136,7 @@ thin.define("Tree", ["Observer"], function (Observer) {
 			}
 
 			if (node.parent == this) {
-				this.dom.removeChild(node.dom);
+				this.childrenContainer.removeChild(node.dom);
 
 				for (var i = 0; i < this.nodes.length; i++) {
 					if (this.nodes[i] == node) {
