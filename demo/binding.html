@@ -31,11 +31,10 @@
 					</div>
 				</div>
 				<div class="control-group">
-					<label class="control-label" for="inputGender">Gender</label>
+					<label class="control-label" for="genderSelect">Gender</label>
 
 					<div class="controls">
-						<input type="text" id="inputGender" placeholder="Gender" vm-value="gender"
-						       vm-enable="enableForm"/>
+						<select id="genderSelect" vm-list="genderArr" vm-value="gender" vm-enable="enableForm"></select>
 					</div>
 				</div>
 			</form>

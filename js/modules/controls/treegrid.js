@@ -14,7 +14,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 		this.header = element.firstChild.tHead;
 		this.tbody = element.firstChild.tBodies[0];
 
-		this.selectedItem = null;
+		this.selectedNode = null;
 	};
 
 	TreeGrid.prototype = {
@@ -28,6 +28,14 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			var checkbox = document.createElement("input");
 			checkbox.type = "checkbox";
 			th.appendChild(checkbox);
+			this.checkbox = checkbox;
+
+			var that = this;
+			checkbox.onclick = function() {
+				for (var i=0; i<that.allNodes.length; i++) {
+					that.allNodes[i].checkbox.checked = checkbox.checked;
+				}
+			};
 
 			for (var i = 0; i < columns.length; i++) {
 				th = tr.insertCell(i + 1);
@@ -52,10 +60,24 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 		},
 
 		initTemplate: function() {
-			var template = '<tr><td><input type="checkbox"/></td>'
-				+ '<td><span style="margin-left: <%= 20*depth %>px"></span><i class="icon-inbox"></i><%= first %></td>'
-				+ '<% _.each(dataArr, function(item) { %> <td><%= item %></td> <% }); %></tr>';
-			this.template = _.template(template);
+			var tr = document.createElement("tr");
+			for (var i=0; i<=this.columns.length; i++) {
+				var td = document.createElement("td");
+				tr.appendChild(td);
+			}
+
+			var checkbox = document.createElement("input");
+			checkbox.type = "checkbox";
+			tr.firstChild.appendChild(checkbox);
+
+			tr.childNodes[1].appendChild(document.createElement("span"));
+
+			var icon = document.createElement("i");
+			icon.className = "icon-folder-open";
+			tr.childNodes[1].appendChild(icon);
+			tr.childNodes[1].appendChild(document.createElement("span"));
+
+			this.template = tr;
 		},
 
 		addNode: function(data, parent) {
@@ -66,7 +88,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 
 			var that = this;
 			node.on("selected", function (event) {
-				that.select(event.row);
+				that.select(event.node);
 			});
 
 			//已经成功添加了新行
@@ -78,23 +100,23 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			this.fire(event);
 		},
 
-		select: function (row) {
+		select: function (node) {
 			var event = {
 				type: "changed",
 				target: this,
-				oldRow: this.selectedRow,
-				newRow: row
+				oldNode: this.selectedNode,
+				newNode: node
 			};
 
-			if (this.selectedRow) {
-				this.selectedRow.select(false);
+			if (this.selectedNode) {
+				this.selectedNode.select(false);
 			}
 
-			if (row) {
-				row.select(true);
+			if (node) {
+				node.select(true);
 			}
 
-			this.selectedRow = row;
+			this.selectedNode = node;
 
 			this.fire(event);
 		}
@@ -112,41 +134,54 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 
 	TreeNode.prototype = {
 		create: function () {
-			var dataArr = [];
-			for (var i = 1; i < this.grid.columns.length; i++) {
-				dataArr[i] = this.data[this.grid.columns[i].field];
-			}
+			var dom = this.grid.template.cloneNode(true);
 
-			var str = this.grid.template({depth:this.depth, first:this.data[this.grid.columns[0].field], dataArr:dataArr});
-			this.grid.tbody.innerHTML += str;
+			this.grid.tbody.appendChild(dom);
 
 			if (this.data.children) {
 				for (var i = 0; i < this.data.children.length; i++) {
 					this.addNode(this.data.children[i]);
 				}
+				this.expanded = true;
 			}
 
-			//this.checkbox = checkbox;
-
-			/*
-			for (var i = 0; i < this.grid.columns.length; i++) {
-				cell = document.createElement("td");
-				cell.innerHTML = this.data[this.grid.columns[i].field] || "";
-				row.appendChild(cell);
-			}
-			this.dom = row;
+			this.dom = dom;
+			this.checkbox = this.dom.querySelector("tr>td>input");
 
 			var that = this;
-			row.onclick = function (event) {
+			this.checkbox.onclick = function() {
+				that.check(that.checkbox.checked);
+			};
+
+			this.dom.querySelector("tr>td>i").onclick = function() {
+				if (that.expanded) {
+					that.collapse();
+				}
+				else {
+					that.expand();
+				}
+			};
+
+			var that = this;
+			this.dom.onclick = function (event) {
 				//通知上级，我被点了
 				var newEvent = {
 					type: "selected",
 					target: that,
-					row: that
+					node: that
 				};
 				that.fire(newEvent);
+			};
+
+			this.dom.childNodes[1].firstChild.style.width = this.depth * 20 + "px";
+			this.dom.childNodes[1].childNodes[1].style.marginLeft = this.depth * 20;
+			this.dom.childNodes[1].firstChild.innerHTML = this.depth * 20;
+			this.dom.childNodes[1].lastChild.innerHTML = this.data[this.grid.columns[0].field];
+			var dataArr = [];
+			for (var i = 1; i < this.grid.columns.length; i++) {
+				dataArr[i] = this.data[this.grid.columns[i].field];
+				this.dom.childNodes[i+1].innerHTML = dataArr[i];
 			}
-			*/
 		},
 
 		destroy: function () {
@@ -159,12 +194,16 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			this.grid.addNode(data, this);
 		},
 
+		removeNode: function(node) {
+
+		},
+
 		select: function (flag) {
 			if (flag) {
-				//this.dom.className = "info";
+				this.dom.className = "info";
 			}
 			else {
-				//this.dom.className = "";
+				this.dom.className = "";
 			}
 		},
 
@@ -176,6 +215,37 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 					this.dom.childNodes[i].innerHTML = value;
 					break;
 				}
+			}
+		},
+
+		show: function() {
+			this.dom.style.display = "";
+			this.expand();
+		},
+
+		hide: function() {
+			this.dom.style.display = "none";
+			this.collapse();
+		},
+
+		expand: function() {
+			for (var i=0; i<this.childNodes.length; i++) {
+				this.childNodes[i].show();
+			}
+			this.expanded = true;
+		},
+
+		collapse: function() {
+			for (var i=0; i<this.childNodes.length; i++) {
+				this.childNodes[i].hide();
+			}
+			this.expanded = false;
+		},
+
+		check: function(flag) {
+			this.checkbox.checked = flag;
+			for (var i=0; i<this.childNodes.length; i++) {
+				this.childNodes[i].check(flag);
 			}
 		},
 

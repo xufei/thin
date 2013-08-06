@@ -121,13 +121,31 @@ thin.define("DOMBinding", [], function () {
 			element.value = value || "";
 		});
 
-		element.onkeyup = function () {
-			vm[key] = element.value;
-		};
+		/*
+		switch () {
+			case "TextInput": {
 
-		element.onpaste = function () {
-			vm[key] = element.value;
-		};
+			}
+		}
+		*/
+		bindTextValue(element, key, vm);
+
+		function bindTextValue(el, key, model) {
+
+			el.onkeyup = function () {
+				model[key] = el.value;
+			};
+
+			el.onpaste = function () {
+				model[key] = el.value;
+			};
+		}
+
+		function bindSelectValue() {
+			el.onchange = function() {
+				vm[key] = el.value;
+			}
+		}
 	}
 
 	function bindList(element, key, vm) {

@@ -65,6 +65,10 @@ thin.define("DOMSelector", [], function() {
 				thin.on.call(element, "click", handler);
 			});
 			return this;
+		},
+
+		querySelector: function(selector) {
+
 		}
 	};
 
@@ -89,7 +93,9 @@ thin.define("DOMSelector", [], function() {
 		},
 
 		bySelector: function(selector) {
-
+			var dom = new DOM();
+			dom.elements = [].slice.call(document.querySelector(selector));
+			return dom;
 		}
 	};
 

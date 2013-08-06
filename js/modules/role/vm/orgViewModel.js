@@ -91,7 +91,17 @@ thin.define("OrgViewModel", ["TreeGrid"], function (TreeGrid) {
 				},
 				{
 					name: "Fujian",
-					code: "fj"
+					code: "fj",
+					children: [
+						{
+							name: "Fuzhou",
+							code: "fz"
+						},
+						{
+							name: "Xiamen",
+							code: "xm"
+						}
+					]
 				}
 			];
 
