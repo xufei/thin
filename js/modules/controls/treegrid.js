@@ -173,8 +173,9 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 				that.fire(newEvent);
 			};
 
-			this.dom.childNodes[1].firstChild.style.width = this.depth * 20 + "px";
-			this.dom.childNodes[1].childNodes[1].style.marginLeft = this.depth * 20;
+			this.blankSpan = this.dom.childNodes[1].firstChild;
+
+			this.blankSpan.style.marginLeft = this.depth * 20;
 			this.dom.childNodes[1].firstChild.innerHTML = this.depth * 20;
 			this.dom.childNodes[1].lastChild.innerHTML = this.data[this.grid.columns[0].field];
 			var dataArr = [];

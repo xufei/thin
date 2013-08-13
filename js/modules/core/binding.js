@@ -1,16 +1,3 @@
-thin.define("Component", ["AJAX"], function(AJAX) {
-
-	function load(url) {
-		AJAX.get(url, function(data) {
-			alert(data);
-		});
-	}
-
-	return {
-		load: load
-	};
-});
-
 thin.define("DOMBinding", [], function () {
 	var Binder = {
 		$watch: function (key, watcher) {

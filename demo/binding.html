@@ -7,7 +7,7 @@
 	<meta name="description" content="DataGrid, binding">
 	<meta name="author" content="xu.fei@outlook.com">
 
-	<link rel="stylesheet" href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css"/>
+	<link rel="stylesheet" href="http://libs.baidu.com/bootstrap/2.0.4/css/bootstrap.min.css"/>
 	<script type="text/javascript" src="../js/thin.js"></script>
 </head>
 <body>
@@ -70,7 +70,9 @@
 </div>
 
 <script type="text/javascript">
-	thin.require(["controls/datagrid", "role/vm/staffViewModel"]);
+	thin.require(["controls/datagrid", "role/vm/staffViewModel"], function() {
+		thin.fire({type:"ready"});
+	});
 </script>
 
 </body>

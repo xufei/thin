@@ -155,10 +155,6 @@
 			readyFunctions[priority].push(handler);
 		},
 
-		on: addListener,
-
-		off: removeListener,
-
 		error: function () {
 
 		},
@@ -171,24 +167,17 @@
 
 			}
 		}
-	});
+	}).extend(Observer);
 
 	//Observer
 	thin.define("Observer", [], function () {
 		return Observer;
 	});
 
-	//Global observer, all event go my home
-	thin.define("EventBus", ["Observer"], function (Observer) {
-		var EventBus = {}.extend(Observer);
-
-		return EventBus;
-	});
-
-	thin.ready(function () {
+	thin.on("ready", function() {
 		thin.require(["core/binding"], function () {
 			var binding = thin.use("DOMBinding");
 			binding.parse(doc.body);
 		});
-	}, 0);
+	});
 })(document);
