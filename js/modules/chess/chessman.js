@@ -4,6 +4,7 @@ thin.define("ChessMan", [], function () {
 		this.type = type;
 		this.x = -1;
 		this.y = -1;
+        this.game = null;
 
 		this.beAttack = false;
 	}
@@ -11,7 +12,7 @@ thin.define("ChessMan", [], function () {
 	return ChessMan;
 });
 
-thin.define("General", ["ChessService", "ChessMan", "ChessType", "ChessColor"], function (ChessService, ChessMan, ChessType, ChessColor) {
+thin.define("General", ["ChessMan", "ChessType", "ChessColor"], function (ChessMan, ChessType, ChessColor) {
 	function General(color) {
 		ChessMan.call(this, color, ChessType.GENERAL);
 	}
@@ -37,7 +38,7 @@ thin.define("General", ["ChessService", "ChessMan", "ChessType", "ChessColor"], 
 		},
 
 		canGo: function (x, y) {
-			if (this.valid(x, y) && !ChessService.isFriendly(this.color, x, y)) {
+			if (this.valid(x, y) && !this.game.isFriendly(this.color, x, y)) {
 				if (Math.abs(this.y - y) + Math.abs(this.x - x) != 1) {
 					return false;
 				}
@@ -52,7 +53,7 @@ thin.define("General", ["ChessService", "ChessMan", "ChessType", "ChessColor"], 
 	return General;
 });
 
-thin.define("Guard", ["ChessService", "ChessMan", "ChessType", "ChessColor"], function (ChessService, ChessMan, ChessType, ChessColor) {
+thin.define("Guard", ["ChessMan", "ChessType", "ChessColor"], function (ChessMan, ChessType, ChessColor) {
 	function Guard(color) {
 		ChessMan.call(this, color, ChessType.GUARD);
 	}
@@ -84,7 +85,7 @@ thin.define("Guard", ["ChessService", "ChessMan", "ChessType", "ChessColor"], fu
 		},
 
 		canGo: function (x, y) {
-			if (this.valid(x, y) && !ChessService.isFriendly(this.color, x, y)) {
+			if (this.valid(x, y) && !this.game.isFriendly(this.color, x, y)) {
 				if ((Math.abs(this.x - x) > 1)
 					|| (Math.abs(this.y - y) > 1)
 					|| ((Math.abs(this.x - x) == 0)
@@ -102,7 +103,7 @@ thin.define("Guard", ["ChessService", "ChessMan", "ChessType", "ChessColor"], fu
 	return Guard;
 });
 
-thin.define("Staff", ["ChessService", "ChessMan", "ChessType", "ChessColor"], function (ChessService, ChessMan, ChessType, ChessColor) {
+thin.define("Staff", ["ChessMan", "ChessType", "ChessColor"], function (ChessMan, ChessType, ChessColor) {
 	function Staff(color) {
 		ChessMan.call(this, color, ChessType.STAFF);
 	}
@@ -138,7 +139,7 @@ thin.define("Staff", ["ChessService", "ChessMan", "ChessType", "ChessColor"], fu
 		},
 
 		canGo: function (x, y) {
-			if (this.valid(x, y) && !ChessService.isFriendly(this.color, x, y)) {
+			if (this.valid(x, y) && !this.game.isFriendly(this.color, x, y)) {
 				if ((Math.abs(this.x - x) != 2)
 					|| (Math.abs(this.y - y) != 2)) {
 					return false;
@@ -146,7 +147,7 @@ thin.define("Staff", ["ChessService", "ChessMan", "ChessType", "ChessColor"], fu
 				else {
 					var i = (this.x + x) / 2;
 					var j = (this.y + y) / 2;
-					if (ChessService.isEmpty(i, j)) {
+					if (this.game.isEmpty(i, j)) {
 						return true;
 					}
 					else {
@@ -161,7 +162,7 @@ thin.define("Staff", ["ChessService", "ChessMan", "ChessType", "ChessColor"], fu
 	return Staff;
 });
 
-thin.define("Horse", ["ChessService", "ChessMan", "ChessType"], function (ChessService, ChessMan, ChessType) {
+thin.define("Horse", ["ChessMan", "ChessType"], function (ChessMan, ChessType) {
 	function Horse(color) {
 		ChessMan.call(this, color, ChessType.HORSE);
 	}
@@ -172,7 +173,7 @@ thin.define("Horse", ["ChessService", "ChessMan", "ChessType"], function (ChessS
 		},
 
 		canGo: function (x, y) {
-			if (this.valid(x, y) && !ChessService.isFriendly(this.color, x, y)) {
+			if (this.valid(x, y) && !this.game.isFriendly(this.color, x, y)) {
 				if (((Math.abs(this.x - x) == 1)
 					&& (Math.abs(this.y - y) == 2))
 					|| ((Math.abs(this.x - x) == 2)
@@ -196,7 +197,7 @@ thin.define("Horse", ["ChessService", "ChessMan", "ChessType"], function (ChessS
 						j = this.y - 1;
 					}
 
-					if (ChessService.isEmpty(i, j)) {
+					if (this.game.isEmpty(i, j)) {
 						return true;
 					}
 				}
@@ -208,7 +209,7 @@ thin.define("Horse", ["ChessService", "ChessMan", "ChessType"], function (ChessS
 	return Horse;
 });
 
-thin.define("Chariot", ["ChessService", "ChessMan", "ChessType"], function (ChessService, ChessMan, ChessType) {
+thin.define("Chariot", ["ChessMan", "ChessType"], function (ChessMan, ChessType) {
 	function Chariot(color) {
 		ChessMan.call(this, color, ChessType.CHARIOT);
 	}
@@ -219,7 +220,7 @@ thin.define("Chariot", ["ChessService", "ChessMan", "ChessType"], function (Ches
 		},
 
 		canGo: function (x, y) {
-			if (this.valid(x, y) && !ChessService.isFriendly(this.color, x, y)) {
+			if (this.valid(x, y) && !this.game.isFriendly(this.color, x, y)) {
 				if ((this.x != x) && (this.y != y)) {
 					return false;
 				}
@@ -227,7 +228,7 @@ thin.define("Chariot", ["ChessService", "ChessMan", "ChessType"], function (Ches
 					if (this.y == y) {
 						if (this.x < x) {
 							for (var i = this.i + 1; i < x; i++) {
-								if (!ChessService.isEmpty(i, this.y)) {
+								if (!this.game.isEmpty(i, this.y)) {
 									return false;
 								}
 							}
@@ -236,7 +237,7 @@ thin.define("Chariot", ["ChessService", "ChessMan", "ChessType"], function (Ches
 
 						if (this.x > x) {
 							for (var i = this.x - 1; i > x; i--) {
-								if (!ChessService.isEmpty(i, this.y)) {
+								if (!this.game.isEmpty(i, this.y)) {
 									return false;
 								}
 							}
@@ -246,7 +247,7 @@ thin.define("Chariot", ["ChessService", "ChessMan", "ChessType"], function (Ches
 					else {
 						if (this.y < y) {
 							for (var i = this.y + 1; i < y; i++) {
-								if (!ChessService.isEmpty(this.x, i)) {
+								if (!this.game.isEmpty(this.x, i)) {
 									return false;
 								}
 							}
@@ -255,7 +256,7 @@ thin.define("Chariot", ["ChessService", "ChessMan", "ChessType"], function (Ches
 
 						if (this.y > y) {
 							for (var i = this.y - 1; i > y; i--) {
-								if (!ChessService.isEmpty(this.x, i)) {
+								if (!this.game.isEmpty(this.x, i)) {
 									return false;
 								}
 							}
@@ -271,7 +272,7 @@ thin.define("Chariot", ["ChessService", "ChessMan", "ChessType"], function (Ches
 	return Chariot;
 });
 
-thin.define("Cannon", ["ChessService", "ChessMan", "ChessType"], function (ChessService, ChessMan, ChessType) {
+thin.define("Cannon", ["ChessMan", "ChessType"], function (ChessMan, ChessType) {
 	function Cannon(color) {
 		ChessMan.call(this, color, ChessType.CANNON);
 	}
@@ -282,16 +283,16 @@ thin.define("Cannon", ["ChessService", "ChessMan", "ChessType"], function (Chess
 		},
 
 		canGo: function (x, y) {
-			if (this.valid(x, y) && !ChessService.isFriendly(this.color, x, y)) {
+			if (this.valid(x, y) && !this.game.isFriendly(this.color, x, y)) {
 				if ((this.x != x) && (this.y != y)) {
 					return false;
 				}
 				else {
-					if (ChessService.isEmpty(x, y)) {
+					if (this.game.isEmpty(x, y)) {
 						if (this.y == y) {
 							if (this.x < x) {
 								for (var i = this.x + 1; i < x; i++) {
-									if (!ChessService.isEmpty(i, this.y)) {
+									if (!this.game.isEmpty(i, this.y)) {
 										return false;
 									}
 								}
@@ -300,7 +301,7 @@ thin.define("Cannon", ["ChessService", "ChessMan", "ChessType"], function (Chess
 
 							if (this.x > x) {
 								for (var i = this.x - 1; i > x; i--) {
-									if (!ChessService.isEmpty(i, this.y)) {
+									if (!this.game.isEmpty(i, this.y)) {
 										return false;
 									}
 								}
@@ -310,7 +311,7 @@ thin.define("Cannon", ["ChessService", "ChessMan", "ChessType"], function (Chess
 						else {
 							if (this.y < y) {
 								for (var i = this.y + 1; i < y; i++) {
-									if (!ChessService.isEmpty(this.x, i)) {
+									if (!this.game.isEmpty(this.x, i)) {
 										return false;
 									}
 								}
@@ -319,7 +320,7 @@ thin.define("Cannon", ["ChessService", "ChessMan", "ChessType"], function (Chess
 
 							if (this.y > y) {
 								for (var i = this.y - 1; i > y; i--) {
-									if (!ChessService.isEmpty(this.x, i)) {
+									if (!this.game.isEmpty(this.x, i)) {
 										return false;
 									}
 								}
@@ -333,7 +334,7 @@ thin.define("Cannon", ["ChessService", "ChessMan", "ChessType"], function (Chess
 						if (this.y == y) {
 							if (this.x < x) {
 								for (var i = this.x + 1; i < x; i++) {
-									if (!ChessService.isEmpty(i, this.y)) {
+									if (!this.game.isEmpty(i, this.y)) {
 										count++;
 									}
 								}
@@ -344,7 +345,7 @@ thin.define("Cannon", ["ChessService", "ChessMan", "ChessType"], function (Chess
 
 							if (this.x > x) {
 								for (var i = this.x - 1; i > x; i--) {
-									if (!ChessService.isEmpty(i, this.y)) {
+									if (!this.game.isEmpty(i, this.y)) {
 										count++;
 									}
 								}
@@ -356,7 +357,7 @@ thin.define("Cannon", ["ChessService", "ChessMan", "ChessType"], function (Chess
 						else {
 							if (this.y < y) {
 								for (var i = this.y + 1; i < y; i++) {
-									if (!ChessService.isEmpty(this.x, i)) {
+									if (!this.game.isEmpty(this.x, i)) {
 										count++;
 									}
 								}
@@ -367,7 +368,7 @@ thin.define("Cannon", ["ChessService", "ChessMan", "ChessType"], function (Chess
 
 							if (this.y > y) {
 								for (var i = this.y - 1; i > y; i--) {
-									if (!ChessService.isEmpty(this.x, i)) {
+									if (!this.game.isEmpty(this.x, i)) {
 										count++;
 									}
 								}
@@ -386,7 +387,7 @@ thin.define("Cannon", ["ChessService", "ChessMan", "ChessType"], function (Chess
 	return Cannon;
 });
 
-thin.define("Soldier", ["ChessService", "ChessMan", "ChessType", "ChessColor"], function (ChessService, ChessMan, ChessType, ChessColor) {
+thin.define("Soldier", ["ChessMan", "ChessType", "ChessColor"], function (ChessMan, ChessType, ChessColor) {
 	function Soldier(color) {
 		ChessMan.call(this, color, ChessType.SOLDIER);
 	}
@@ -415,7 +416,7 @@ thin.define("Soldier", ["ChessService", "ChessMan", "ChessType", "ChessColor"], 
 
 		canGo: function (x, y) {
 			var result = false;
-			if (this.valid(x, y) && !ChessService.isFriendly(this.color, x, y)) {
+			if (this.valid(x, y) && !this.game.isFriendly(this.color, x, y)) {
 				result = true;
 				switch (this.color) {
 					case ChessColor.BLACK:

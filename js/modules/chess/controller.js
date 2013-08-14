@@ -1,4 +1,4 @@
-thin.define("ChessController", ["ChessBoard", "ChessFactory", "ChessService"], function (ChessBoard, ChessFactory, ChessService) {
+thin.define("ChessController", ["ChessBoard", "ChessFactory", "Chess.Service"], function (ChessBoard, ChessFactory, ChessService) {
 	//color, type, x, y
 	var chesses = [
 		[1, 7, 4, 9],
@@ -38,6 +38,10 @@ thin.define("ChessController", ["ChessBoard", "ChessFactory", "ChessService"], f
 
 	return {
 		init: function (element) {
+            var game = ChessService.createGame(chesses);
+            this.game = game;
+
+            /*
 			ChessService.factory = ChessFactory;
 
 			ChessService.click(function (event) {
@@ -73,14 +77,17 @@ thin.define("ChessController", ["ChessBoard", "ChessFactory", "ChessService"], f
 			ChessService.error(function (event) {
 				alert(event.text);
 			});
-
 			ChessService.init(chesses);
-			ChessBoard.drawBoard(element);
-			ChessBoard.drawChess();
+			*/
+
+            var chessBoard = new ChessBoard();
+            chessBoard.game = game;
+            chessBoard.drawBoard(element);
+            chessBoard.drawChess();
 		},
 
 		undo: function() {
-			ChessService.undo();
+			this.game.undo();
 		}
 	};
 });

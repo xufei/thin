@@ -1,16 +1,19 @@
-thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"], function (Config, ChessText, ChessColor, ChessService) {
+thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], function (Observer, Config, ChessText, ChessColor) {
 	var offsetX = Config.offsetX;
 	var offsetY = Config.offsetY;
 	var gridSize = Config.gridSize;
 
-	var blankArr = [];
-	var attackArr = [];
-	var chesses = [];
-	for (var i = 0; i < 9; i++) {
-		chesses[i] = [];
-	}
+    var ChessBoard = function() {
+        this.blankArr = [];
+        this.attackArr = [];
+        this.chesses = [];
 
-	return {
+        for (var i = 0; i < 9; i++) {
+            this.chesses[i] = [];
+        }
+    };
+
+	ChessBoard.prototype = {
 		drawLine: function (x1, y1, x2, y2) {
 			this.paper.path("M" + (offsetX + x1 * gridSize) + "," + (offsetY + y1 * gridSize) + " L" + (offsetX + x2 * gridSize) + "," + (offsetY + y2 * gridSize));
 		},
@@ -96,7 +99,7 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 		drawChess: function (chess) {
 			for (var i = 0; i < 9; i++) {
 				for (var j = 0; j < 10; j++) {
-					var chess = ChessService.getChess(i, j);
+					var chess = this.game.getChess(i, j);
 
 					if (chess) {
 						var x = offsetX + gridSize * chess.x;
@@ -124,13 +127,14 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 							"cursor": "pointer"
 						});
 
+                        var that = this;
 						group.click((function (context) {
 							return function () {
-								ChessService.chessClicked(context);
+                                that.game.chessClicked(context);
 							};
 						})(chess));
 
-						chesses[i][j] = {
+						this.chesses[i][j] = {
 							group: group,
 							bound: bound,
 							label: label
@@ -144,7 +148,7 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 			var x = offsetX + gridSize * newX;
 			var y = offsetY + gridSize * newY;
 
-			var chess = chesses[oldX][oldY];
+			var chess = this.chesses[oldX][oldY];
 			chess.group.attr({
 				cx: x,
 				cy: y
@@ -155,18 +159,18 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 				y: y
 			});
 
-			chesses[oldX][oldY] = null;
-			chesses[newX][newY] = chess;
+            this.chesses[oldX][oldY] = null;
+            this.chesses[newX][newY] = chess;
 		},
 
 		attackChess: function (oldX, oldY, newX, newY) {
-			chesses[newX][newY].label.remove();
-			chesses[newX][newY].group.remove();
+            this.chesses[newX][newY].label.remove();
+            this.chesses[newX][newY].group.remove();
 
 			var x = offsetX + gridSize * newX;
 			var y = offsetY + gridSize * newY;
 
-			var chess = chesses[oldX][oldY];
+			var chess = this.chesses[oldX][oldY];
 			chess.group.attr({
 				cx: x,
 				cy: y
@@ -176,8 +180,8 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 				x: x,
 				y: y
 			});
-			chesses[oldX][oldY] = null;
-			chesses[newX][newY] = chess;
+            this.chesses[oldX][oldY] = null;
+            this.chesses[newX][newY] = chess;
 		},
 
 		drawBlank: function (x, y) {
@@ -191,18 +195,19 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 				"fill": "#eeeeee"
 			});
 
+            var that = this;
 			rect.click(function () {
-				ChessService.blankClicked(x, y);
+                that.game.blankClicked(x, y);
 			});
 
-			blankArr.push(rect);
+            this.blankArr.push(rect);
 		},
 
 		clearBlank: function () {
-			for (var i = 0; i < blankArr.length; i++) {
-				blankArr[i].remove();
+			for (var i = 0; i < this.blankArr.length; i++) {
+                this.blankArr[i].remove();
 			}
-			blankArr = [];
+            this.blankArr = [];
 		},
 
 		drawAttack: function (x, y) {
@@ -215,27 +220,30 @@ thin.define("ChessBoard", ["Config", "ChessText", "ChessColor", "ChessService"],
 				"stroke": "green"
 			});
 
+            var that = this;
 			rect.click(function () {
-				ChessService.blankClicked(x, y);
+                that.game.blankClicked(x, y);
 			});
 
-			attackArr.push(rect);
+            this.attackArr.push(rect);
 		},
 
 		clearAttack: function () {
-			for (var i = 0; i < attackArr.length; i++) {
-				attackArr[i].remove();
+			for (var i = 0; i < this.attackArr.length; i++) {
+                this.attackArr[i].remove();
 			}
-			attackArr = [];
+            this.attackArr = [];
 		},
 
 		clearAll: function () {
-			for (var i = 0; i < chesses.length; i++) {
-				for (var j = 0; j < chesses[i].length; j++) {
-					chesses[i][j].label.remove();
-					chesses[i][j].group.remove();
+			for (var i = 0; i < this.chesses.length; i++) {
+				for (var j = 0; j < this.chesses[i].length; j++) {
+                    this.chesses[i][j].label.remove();
+                    this.chesses[i][j].group.remove();
 				}
 			}
 		}
-	};
+    }.extend(Observer);
+
+    return ChessBoard;
 });
