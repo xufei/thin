@@ -153,18 +153,14 @@ thin.define("OrgViewModel", ["TreeGrid"], function (TreeGrid) {
 
 		getFormData: function () {
 			return {
-				index: this.index,
 				name: this.name,
-				gender: this.gender,
-				age: this.age
+				code: this.code
 			};
 		},
 
 		setFormData: function (data) {
-			this.index = data.index;
 			this.name = data.name;
-			this.gender = data.gender;
-			this.age = data.age;
+			this.code = data.code;
 		}
 	};
 

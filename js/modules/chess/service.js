@@ -1,3 +1,40 @@
+thin.define("Chess.Service", ["ChessFactory"], function(factory) {
+	var gameList = [];
+
+	function Game() {
+		this.situation = [];
+		this.currentColor = ChessColor.RED;
+		this.undoList = [];
+		this.redoList = [];
+		this.chessUnderAttack = [];
+	}
+
+	Game.prototype = {
+		createChess: function() {
+			var chess = factory.createChess(data);
+			this.situation[chess.x][chess.y] = chess;
+
+			return chess;
+		}
+	};
+
+	var Service = {
+		createGame: function(data) {
+			var game = new Game();
+
+			for (var i = 0; i < 9; i++) {
+				game.situation[i] = [];
+			}
+
+			for (var i = 0; i < data.length; i++) {
+				game.createChess(data[i]);
+			}
+
+
+		}
+	};
+});
+
 thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, ChessColor) {
 	var situation;
 	var observer = {};

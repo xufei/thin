@@ -23,35 +23,21 @@
 				<h4>Detail</h4>
 			</div>
 			<hr/>
-			<form class="form-horizontal span6">
-				<div class="control-group">
-					<label class="control-label" for="inputIndex">Index</label>
+			<form class="form-horizontal">
+				<div class="row span12">
+					<div class="control-group span6">
+						<label class="control-label" for="inputName">Name</label>
 
-					<div class="controls">
-						<input type="text" id="inputIndex" placeholder="Index" vm-value="index" vm-enable="enableForm"/>
+						<div class="controls">
+							<input type="text" id="inputName" placeholder="Name" vm-value="name" vm-enable="enableForm"/>
+						</div>
 					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="genderSelect">Gender</label>
+					<div class="control-group span6">
+						<label class="control-label" for="inputCode">Code</label>
 
-					<div class="controls">
-						<select id="genderSelect" vm-list="genderArr" vm-value="gender" vm-enable="enableForm"></select>
-					</div>
-				</div>
-			</form>
-			<form class="form-horizontal span6">
-				<div class="control-group">
-					<label class="control-label" for="inputName">Name</label>
-
-					<div class="controls">
-						<input type="text" id="inputName" placeholder="Name" vm-value="name" vm-enable="enableForm"/>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="inputAge">Age</label>
-
-					<div class="controls">
-						<input type="text" id="inputAge" placeholder="age" vm-value="age" vm-enable="enableForm"/>
+						<div class="controls">
+							<input type="text" id="inputCode" placeholder="code" vm-value="code" vm-enable="enableForm"/>
+						</div>
 					</div>
 				</div>
 			</form>

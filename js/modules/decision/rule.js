@@ -1,0 +1,3 @@
+thin.define("Rule", [], function() {
+
+});
