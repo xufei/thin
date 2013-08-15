@@ -1,16 +1,79 @@
-thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessFactory"], function(Observer, Color, Type, Factory) {
+thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText", "ChessFactory", "ChessBoard"], function(Observer, Color, Type, Text, Factory, ChessBoard) {
+	//color, type, x, y
+	var chesses = [
+		[1, 7, 4, 9],
+		[1, 6, 3, 9],
+		[1, 6, 5, 9],
+		[1, 5, 2, 9],
+		[1, 5, 6, 9],
+		[1, 4, 1, 9],
+		[1, 4, 7, 9],
+		[1, 3, 0, 9],
+		[1, 3, 8, 9],
+		[1, 2, 1, 7],
+		[1, 2, 7, 7],
+		[1, 1, 0, 6],
+		[1, 1, 2, 6],
+		[1, 1, 4, 6],
+		[1, 1, 6, 6],
+		[1, 1, 8, 6],
+
+		[-1, 7, 4, 0],
+		[-1, 6, 3, 0],
+		[-1, 6, 5, 0],
+		[-1, 5, 2, 0],
+		[-1, 5, 6, 0],
+		[-1, 4, 1, 0],
+		[-1, 4, 7, 0],
+		[-1, 3, 0, 0],
+		[-1, 3, 8, 0],
+		[-1, 2, 1, 2],
+		[-1, 2, 7, 2],
+		[-1, 1, 0, 3],
+		[-1, 1, 2, 3],
+		[-1, 1, 4, 3],
+		[-1, 1, 6, 3],
+		[-1, 1, 8, 3]
+	];
+
 	var games = [];
 
 	function Game() {
         this.id = games.length;
 		this.situation = [];
 		this.currentColor = Color.RED;
+		this.currentChess = null;
 		this.undoList = [];
 		this.redoList = [];
 		this.chessUnderAttack = [];
 	}
 
 	Game.prototype = {
+		init: function(element) {
+			var chessBoard = new ChessBoard();
+			chessBoard.game = this;
+			this.chessBoard = chessBoard;
+			chessBoard.drawBoard(element);
+			chessBoard.drawChess();
+
+			var game = this;
+			game.on("click", function (event) {
+				var canGo = event.canGo;
+				var canKill = event.canKill;
+
+				chessBoard.clearBlank();
+				chessBoard.clearAttack();
+
+				for (var i = 0; i < canGo.length; i++) {
+					chessBoard.drawBlank(canGo[i].x, canGo[i].y);
+				}
+
+				for (var i = 0; i < canKill.length; i++) {
+					chessBoard.drawAttack(canKill[i].x, canKill[i].y);
+				}
+			});
+		},
+
 		createChess: function(data) {
 			var chess = Factory.createChess(data);
             chess.game = this;
@@ -19,29 +82,24 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessFacto
 			return chess;
 		},
 
-        click: function (handler) {
-            this.on("click", handler);
-        },
+		isFriendly: function (color, x, y) {
+			if (this.isEmpty(x, y))
+				return false;
 
-        move: function (handler) {
-            this.on("move", handler);
-        },
+			return color + this.getChess(x, y).color != 0;
+		},
 
-        attack: function (handler) {
-            this.on("attack", handler);
-        },
+		isEmpty: function (x, y) {
+			return !this.situation[x][y];
+		},
 
-        error: function (handler) {
-            this.on("error", handler);
-        },
+		getChess: function (x, y) {
+			return this.situation[x][y];
+		},
 
-        chessClicked: function (chess) {
+        select: function (chess) {
             if (this.currentColor == Color.GREY) {
-                var event = {
-                    type: "error",
-                    text: "棋局已终止！"
-                };
-                this.fire(event);
+                this.prompt("棋局已终止！");
                 return;
             }
 
@@ -56,65 +114,45 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessFacto
                     }
 
                     if (canKill) {
-                        var event = {
-                            type: "attack",
-                            from: {
-                                x: this.currentChess.x,
-                                y: this.currentChess.y
-                            },
-                            to: {
-                                x: chess.x,
-                                y: chess.y
-                            }
-                        };
-                        this.fire(event);
+						var step = {
+		                    color: chess.color,
+		                    type: chess.type,
+		                    from: {
+			                    x: this.currentChess.x,
+			                    y: this.currentChess.y
+		                    },
+		                    to: {
+			                    x: chess.x,
+			                    y: chess.y
+		                    },
+		                    enemy: {
 
-                        var step = {
-                            color: chess.color,
-                            type: chess.type,
-                            from: {
-                                x: this.currentChess.x,
-                                y: this.currentChess.y
-                            },
-                            to: {
-                                x: chess.x,
-                                y: chess.y
-                            },
-                            enemy: {
+		                    }
+	                    };
 
-                            }
-                        };
-
-                        this.undoList.push(step);
+	                    this.undoList.push(step);
+	                    this.chessBoard.clearBlank();
+	                    this.chessBoard.clearAttack();
+	                    this.chessBoard.removeChess(chess.x, chess.y);
+	                    this.chessBoard.moveChess(this.currentChess.x, this.currentChess.y, chess.x, chess.y);
+                        this.moveChess(this.currentChess.x, this.currentChess.y, chess.x, chess.y);
 
                         if (chess.type == Type.GENERAL) {
-                            var winColor = (chess.color == Color.RED) ? "黑" : "红";
-                            var event = {
-                                type: "error",
-                                text: "结束啦，" + winColor + "方胜利！"
-                            };
-                            this.fire(event);
+                            var winner = (chess.color == Color.RED) ? "黑" : "红";
+	                        this.prompt("结束啦，" + winner + "方胜利！");
                             this.currentColor = Color.GREY;
                         }
                         return;
                     }
                     else {
-                        var event = {
-                            type: "error",
-                            text: "吃不到这个棋子！"
-                        };
-                        this.fire(event);
+                        this.prompt("吃不到这个棋子！");
                         return;
                     }
                 }
             }
             else {
                 if (chess.color != this.currentColor) {
-                    var event = {
-                        type: "error",
-                        text: "不该你走！"
-                    };
-                    this.fire(event);
+                    this.prompt("不该你走！");
                     return;
                 }
             }
@@ -141,60 +179,41 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessFacto
                 }
             }
 
-            var event = {
-                type: "click",
-                canGo: whereCanIGo,
-                canKill: this.chessUnderAttack
-            };
-            this.fire(event);
+	        this.chessBoard.clearBlank();
+	        this.chessBoard.clearAttack();
+
+	        for (var i = 0; i < whereCanIGo.length; i++) {
+		        this.chessBoard.drawBlank(whereCanIGo[i].x, whereCanIGo[i].y);
+	        }
+
+	        for (var i = 0; i < this.chessUnderAttack.length; i++) {
+		        this.chessBoard.drawAttack(this.chessUnderAttack[i].x, this.chessUnderAttack[i].y);
+	        }
         },
 
         blankClicked: function (x, y) {
-            var event = {
-                type: "move",
-                from: {
-                    x: this.currentChess.x,
-                    y: this.currentChess.y
-                },
-                to: {
-                    x: x,
-                    y: y
-                }
-            };
-            this.fire(event);
-
-            var step = {
-                color: this.currentChess.color,
-                type: this.currentChess.type,
-                from: {
-                    x: this.currentChess.x,
-                    y: this.currentChess.y
-                },
-                to: {
-                    x: x,
-                    y: y
-                }
-            };
-
-            this.undoList.push(step);
+	        this.chessBoard.clearBlank();
+	        this.chessBoard.clearAttack();
+	        this.chessBoard.moveChess(this.currentChess.x, this.currentChess.y, x, y);
+	        this.moveChess(this.currentChess.x, this.currentChess.y, x, y);
         },
 
-        isFriendly: function (color, x, y) {
-            if (this.isEmpty(x, y))
-                return false;
+        moveChess: function (oldX, oldY, newX, newY) {
+			var step = {
+		        color: this.currentChess.color,
+		        type: this.currentChess.type,
+		        from: {
+			        x: oldX,
+			        y: oldY
+		        },
+		        to: {
+			        x: newX,
+			        y: newY
+		        }
+	        };
 
-            return color + this.getChess(x, y).color != 0;
-        },
+	        this.undoList.push(step);
 
-        isEmpty: function (x, y) {
-            return !this.situation[x][y];
-        },
-
-        getChess: function (x, y) {
-            return this.situation[x][y];
-        },
-
-        moveTo: function (oldX, oldY, newX, newY) {
             var chess = this.situation[oldX][oldY];
 
             this.situation[oldX][oldY] = null;
@@ -203,10 +222,44 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessFacto
             this.situation[newX][newY] = chess;
 
             this.currentColor = Color.RED + Color.BLACK - this.currentColor;
-            this. currentChess = null;
+            this.currentChess = null;
+
+	        this.log(step);
         },
 
-        undo: function() {
+		prompt: function(text) {
+			alert(text);
+		},
+
+		log: function(step) {
+			var numbers = ["一", "二", "三", "四", "五", "六", "七", "八", "九"];
+			var directions = ["进", "平", "退"];
+
+			var chessText = Text[step.type + (step.color + 1) * 7 / 2];
+
+			var direction;
+			if (step.from.y > step.to.y) {
+				direction = -1;
+			}
+			else if (step.from.y == step.to.y) {
+				direction = 0;
+			}
+			else if (step.from.y < step.to.y) {
+				direction = 1;
+			}
+
+			var stepLength;
+			if (step.from.x == step.to.x) {
+				stepLength = Math.abs(step.from.y - step.to.y) - 1;
+			}
+			else {
+				stepLength = step.to.x;
+			}
+
+			console.log(chessText + numbers[step.from.x] + directions[direction * step.color + 1] + numbers[stepLength]);
+		},
+
+		undo: function() {
             if (this.undoList.length > 0) {
                 var step = this.undoList.pop();
 
@@ -223,11 +276,17 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessFacto
                 };
                 this.fire(event);
             }
-        }
+        },
+
+		redo: function() {
+
+		}
     }.extend(Observer);
 
     var Service = {
         createGame: function(data) {
+	        data = data || chesses;
+
             var game = new Game();
 
             for (var i = 0; i < 9; i++) {
@@ -245,254 +304,4 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessFacto
     };
 
     return Service;
-});
-
-thin.define("ChessService", ["ChessType", "ChessColor"], function (ChessType, ChessColor) {
-	var situation;
-	var observer = {};
-	var currentChess;
-	var currentColor = ChessColor.RED;
-
-	var chessUnderAttack = [];
-
-	var undoList = [];
-	var redoList = [];
-
-	var service = {
-		init: function (data) {
-			situation = [];
-			for (var i = 0; i < 9; i++) {
-				situation[i] = [];
-			}
-
-			for (var i = 0; i < data.length; i++) {
-				this.create(data[i]);
-			}
-
-			currentColor = ChessColor.RED;
-			undoList = [];
-			redoList = [];
-		},
-
-		create: function(data) {
-			var chess = this.factory.createChess(data);
-			situation[chess.x][chess.y] = chess;
-
-			return chess;
-		},
-
-		click: function (handler) {
-			observer["click"] = handler;
-		},
-
-		move: function (handler) {
-			observer["move"] = handler;
-		},
-
-		attack: function (handler) {
-			observer["attack"] = handler;
-		},
-
-		error: function (handler) {
-			observer["error"] = handler;
-		},
-
-		fire: function (event) {
-			if (observer[event.type]) {
-				observer[event.type](event);
-			}
-		},
-
-		chessClicked: function (chess) {
-			if (currentColor == ChessColor.GREY) {
-				var event = {
-					type: "error",
-					text: "棋局已终止！"
-				};
-				this.fire(event);
-				return;
-			}
-
-			if (currentChess) {
-				if (currentChess.color + chess.color == 0) {
-					var canKill = false;
-					for (var i = 0; i < chessUnderAttack.length; i++) {
-						if ((chessUnderAttack[i].x == chess.x) && (chessUnderAttack[i].y == chess.y)) {
-							canKill = true;
-							break;
-						}
-					}
-
-					if (canKill) {
-						var event = {
-							type: "attack",
-							from: {
-								x: currentChess.x,
-								y: currentChess.y
-							},
-							to: {
-								x: chess.x,
-								y: chess.y
-							}
-						};
-						this.fire(event);
-
-						var step = {
-							color: chess.color,
-							type: chess.type,
-							from: {
-								x: currentChess.x,
-								y: currentChess.y
-							},
-							to: {
-								x: chess.x,
-								y: chess.y
-							},
-							enemy: {
-
-							}
-						};
-
-						undoList.push(step);
-
-						if (chess.type == ChessType.GENERAL) {
-							var winColor = (chess.color == ChessColor.RED) ? "黑" : "红";
-							var event = {
-								type: "error",
-								text: "结束啦，" + winColor + "方胜利！"
-							};
-							this.fire(event);
-							currentColor = ChessColor.GREY;
-						}
-						return;
-					}
-					else {
-						var event = {
-							type: "error",
-							text: "吃不到这个棋子！"
-						};
-						this.fire(event);
-						return;
-					}
-				}
-			}
-			else {
-				if (chess.color != currentColor) {
-					var event = {
-						type: "error",
-						text: "不该你走！"
-					};
-					this.fire(event);
-					return;
-				}
-			}
-
-			currentChess = chess;
-			var whereCanIGo = [];
-			chessUnderAttack = [];
-			for (var i = 0; i < 9; i++) {
-				for (var j = 0; j < 10; j++) {
-					if (chess.canGo(i, j)) {
-						if (this.isEmpty(i, j)) {
-							whereCanIGo.push({
-								x: i,
-								y: j
-							});
-						}
-						else {
-							chessUnderAttack.push({
-								x: i,
-								y: j
-							});
-						}
-					}
-				}
-			}
-
-			var event = {
-				type: "click",
-				canGo: whereCanIGo,
-				canKill: chessUnderAttack
-			};
-			this.fire(event);
-		},
-
-		blankClicked: function (x, y) {
-			var event = {
-				type: "move",
-				from: {
-					x: currentChess.x,
-					y: currentChess.y
-				},
-				to: {
-					x: x,
-					y: y
-				}
-			};
-			this.fire(event);
-
-			var step = {
-				color: currentChess.color,
-				type: currentChess.type,
-				from: {
-					x: currentChess.x,
-					y: currentChess.y
-				},
-				to: {
-					x: x,
-					y: y
-				}
-			};
-
-			undoList.push(step);
-		},
-
-		isFriendly: function (color, x, y) {
-			if (this.isEmpty(x, y))
-				return false;
-
-			return color + this.getChess(x, y).color != 0;
-		},
-
-		isEmpty: function (x, y) {
-			return !situation[x][y];
-		},
-
-		getChess: function (x, y) {
-			return situation[x][y];
-		},
-
-		moveTo: function (oldX, oldY, newX, newY) {
-			var chess = situation[oldX][oldY];
-
-			situation[oldX][oldY] = null;
-			chess.x = newX;
-			chess.y = newY;
-			situation[newX][newY] = chess;
-
-			currentColor = ChessColor.RED + ChessColor.BLACK - currentColor;
-			currentChess = null;
-		},
-
-		undo: function() {
-			if (undoList.length > 0) {
-				var step = undoList.pop();
-
-				var event = {
-					type: "move",
-					from: {
-						x: currentChess.x,
-						y: currentChess.y
-					},
-					to: {
-						x: x,
-						y: y
-					}
-				};
-				this.fire(event);
-			}
-		}
-	};
-
-	return service;
 });

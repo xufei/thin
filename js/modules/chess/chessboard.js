@@ -4,6 +4,8 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
 	var gridSize = Config.gridSize;
 
     var ChessBoard = function() {
+	    this.game = null;
+
         this.blankArr = [];
         this.attackArr = [];
         this.chesses = [];
@@ -130,7 +132,7 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
                         var that = this;
 						group.click((function (context) {
 							return function () {
-                                that.game.chessClicked(context);
+                                that.game.select(context);
 							};
 						})(chess));
 
@@ -163,25 +165,12 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
             this.chesses[newX][newY] = chess;
 		},
 
-		attackChess: function (oldX, oldY, newX, newY) {
-            this.chesses[newX][newY].label.remove();
-            this.chesses[newX][newY].group.remove();
+		removeChess: function (x, y) {
+            this.chesses[x][y].label.remove();
+            this.chesses[x][y].group.remove();
 
-			var x = offsetX + gridSize * newX;
-			var y = offsetY + gridSize * newY;
-
-			var chess = this.chesses[oldX][oldY];
-			chess.group.attr({
-				cx: x,
-				cy: y
-			});
-
-			chess.label.attr({
-				x: x,
-				y: y
-			});
-            this.chesses[oldX][oldY] = null;
-            this.chesses[newX][newY] = chess;
+			//this.chesses[x][y].off();
+            this.chesses[x][y] = null;
 		},
 
 		drawBlank: function (x, y) {
@@ -222,7 +211,7 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
 
             var that = this;
 			rect.click(function () {
-                that.game.blankClicked(x, y);
+                that.game.attack(x, y);
 			});
 
             this.attackArr.push(rect);
