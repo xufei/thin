@@ -9,7 +9,7 @@ thin.define("Chess.Controller", ["Chess.Service"], function (ChessService) {
 			this.game.undo();
 		},
 
-		redo: function() {
+		redo: function () {
 			this.game.redo();
 		}
 	};

@@ -3,17 +3,17 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
 	var offsetY = Config.offsetY;
 	var gridSize = Config.gridSize;
 
-    var ChessBoard = function() {
-	    this.game = null;
+	var ChessBoard = function () {
+		this.game = null;
 
-        this.blankArr = [];
-        this.attackArr = [];
-        this.chesses = [];
+		this.blankArr = [];
+		this.attackArr = [];
+		this.chesses = [];
 
-        for (var i = 0; i < 9; i++) {
-            this.chesses[i] = [];
-        }
-    };
+		for (var i = 0; i < 9; i++) {
+			this.chesses[i] = [];
+		}
+	};
 
 	ChessBoard.prototype = {
 		drawLine: function (x1, y1, x2, y2) {
@@ -129,10 +129,14 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
 							"cursor": "pointer"
 						});
 
-                        var that = this;
+						var that = this;
 						group.click((function (context) {
 							return function () {
-                                that.game.select(context);
+								var evt = {
+									type: "chessClicked",
+									chess: context
+								};
+								that.fire(evt);
 							};
 						})(chess));
 
@@ -161,16 +165,16 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
 				y: y
 			});
 
-            this.chesses[oldX][oldY] = null;
-            this.chesses[newX][newY] = chess;
+			this.chesses[oldX][oldY] = null;
+			this.chesses[newX][newY] = chess;
 		},
 
 		removeChess: function (x, y) {
-            this.chesses[x][y].label.remove();
-            this.chesses[x][y].group.remove();
+			this.chesses[x][y].label.remove();
+			this.chesses[x][y].group.remove();
 
 			//this.chesses[x][y].off();
-            this.chesses[x][y] = null;
+			this.chesses[x][y] = null;
 		},
 
 		drawBlank: function (x, y) {
@@ -184,19 +188,24 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
 				"fill": "#eeeeee"
 			});
 
-            var that = this;
+			var that = this;
 			rect.click(function () {
-                that.game.blankClicked(x, y);
+				var event = {
+					type: "blankClicked",
+					x: x,
+					y: y
+				};
+				that.fire(event);
 			});
 
-            this.blankArr.push(rect);
+			this.blankArr.push(rect);
 		},
 
 		clearBlank: function () {
 			for (var i = 0; i < this.blankArr.length; i++) {
-                this.blankArr[i].remove();
+				this.blankArr[i].remove();
 			}
-            this.blankArr = [];
+			this.blankArr = [];
 		},
 
 		drawAttack: function (x, y) {
@@ -209,30 +218,25 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
 				"stroke": "green"
 			});
 
-            var that = this;
-			rect.click(function () {
-                that.game.attack(x, y);
-			});
-
-            this.attackArr.push(rect);
+			this.attackArr.push(rect);
 		},
 
 		clearAttack: function () {
 			for (var i = 0; i < this.attackArr.length; i++) {
-                this.attackArr[i].remove();
+				this.attackArr[i].remove();
 			}
-            this.attackArr = [];
+			this.attackArr = [];
 		},
 
 		clearAll: function () {
 			for (var i = 0; i < this.chesses.length; i++) {
 				for (var j = 0; j < this.chesses[i].length; j++) {
-                    this.chesses[i][j].label.remove();
-                    this.chesses[i][j].group.remove();
+					this.chesses[i][j].label.remove();
+					this.chesses[i][j].group.remove();
 				}
 			}
 		}
-    }.extend(Observer);
+	}.extend(Observer);
 
-    return ChessBoard;
+	return ChessBoard;
 });
