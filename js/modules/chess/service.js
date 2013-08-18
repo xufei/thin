@@ -56,7 +56,7 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText"
 			chessBoard.game = this;
 			this.chessBoard = chessBoard;
 			chessBoard.drawBoard(element);
-			chessBoard.drawChess();
+			chessBoard.drawChesses();
 
 			var game = this;
 			chessBoard.on("chessClicked", function (event) {
@@ -67,7 +67,7 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText"
 				game.chessBoard.clearBlank();
 				game.chessBoard.clearAttack();
 				game.chessBoard.moveChess(game.currentChess.x, game.currentChess.y, event.x, event.y);
-				game.moveChess(game.currentChess.x, game.currentChess.y, event.x, event.y);
+				game.moveChess(game.currentChess, event.x, event.y, false);
 			});
 
 			game.on("click", function (event) {
@@ -131,28 +131,11 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText"
 					}
 
 					if (canKill) {
-						var step = {
-							color: chess.color,
-							type: chess.type,
-							from: {
-								x: this.currentChess.x,
-								y: this.currentChess.y
-							},
-							to: {
-								x: chess.x,
-								y: chess.y
-							},
-							enemy: {
-
-							}
-						};
-
-						this.undoList.push(step);
 						this.chessBoard.clearBlank();
 						this.chessBoard.clearAttack();
 						this.chessBoard.removeChess(chess.x, chess.y);
 						this.chessBoard.moveChess(this.currentChess.x, this.currentChess.y, chess.x, chess.y);
-						this.moveChess(this.currentChess.x, this.currentChess.y, chess.x, chess.y);
+						this.moveChess(this.currentChess, chess.x, chess.y, false);
 
 						if (chess.type == Type.GENERAL) {
 							var winner = (chess.color == Color.RED) ? "黑" : "红";
@@ -208,25 +191,24 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText"
 			}
 		},
 
-		moveChess: function (oldX, oldY, newX, newY) {
+		moveChess: function (chess, newX, newY, isUndo) {
 			var step = {
-				color: this.currentChess.color,
-				type: this.currentChess.type,
+				chess: chess,
 				from: {
-					x: oldX,
-					y: oldY
+					x: chess.x,
+					y: chess.y
 				},
-				to: {
-					x: newX,
-					y: newY
-				}
+                dead: this.situation[newX][newY]
 			};
 
-			this.undoList.push(step);
+            if (isUndo) {
+                this.redoList.push(step);
+            }
+            else {
+                this.undoList.push(step);
+            }
 
-			var chess = this.situation[oldX][oldY];
-
-			this.situation[oldX][oldY] = null;
+			this.situation[chess.x][chess.y] = null;
 			chess.x = newX;
 			chess.y = newY;
 			this.situation[newX][newY] = chess;
@@ -259,42 +241,55 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText"
 			var numbers = ["一", "二", "三", "四", "五", "六", "七", "八", "九"];
 			var directions = ["进", "平", "退"];
 
-			var chessText = Text[step.type + (step.color + 1) * 7 / 2];
+			var chessText = Text[step.chess.type + (step.chess.color + 1) * 7 / 2];
 
 			var direction;
-			if (step.from.y > step.to.y) {
+			if (step.from.y > step.chess.y) {
 				direction = -1;
 			}
-			else if (step.from.y == step.to.y) {
+			else if (step.from.y == step.chess.y) {
 				direction = 0;
 			}
-			else if (step.from.y < step.to.y) {
+			else if (step.from.y < step.chess.y) {
 				direction = 1;
 			}
 
 			var stepLength;
-			if (step.from.x == step.to.x) {
-				stepLength = Math.abs(step.from.y - step.to.y) - 1;
+			if (step.from.x == step.chess.x) {
+				stepLength = Math.abs(step.from.y - step.chess.y) - 1;
 			}
 			else {
-				stepLength = step.to.x;
+				stepLength = step.chess.x;
 			}
 
-			var text = chessText + numbers[step.from.x] + directions[direction * step.color + 1] + numbers[stepLength];
+			var text = chessText + numbers[step.from.x] + directions[direction * step.chess.color + 1] + numbers[stepLength];
 			console.log(text);
 		},
 
 		undo: function () {
 			if (this.undoList.length > 0) {
 				var step = this.undoList.pop();
+                this.chessBoard.moveChess(step.chess.x, step.chess.y, step.from.x, step.from.y);
+                this.moveChess(step.chess, step.from.x, step.from.y, true);
 
-
-				this.redoList.push(step);
+                if (step.dead) {
+                    this.situation[step.chess.x][step.chess.y] = step.dead;
+                    this.chessBoard.drawChess(step.dead);
+                }
 			}
 		},
 
-		redo: function () {
+		redo:function () {
+            if (this.redoList.length > 0) {
+                var step = this.redoList.pop();
+                this.chessBoard.moveChess(step.chess.x, step.chess.y, step.from.x, step.from.y);
+                this.moveChess(step.chess, step.from.x, step.from.y);
 
+                if (step.dead) {
+                    this.situation[step.chess.x][step.chess.y] = step.dead;
+                    this.chessBoard.drawChess(step.dead);
+                }
+            }
 		}
 	}.extend(Observer);
 

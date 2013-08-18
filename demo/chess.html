@@ -10,8 +10,12 @@
 	<script type="text/javascript" src="../libs/raphael-min.js"></script>
 </head>
 <body>
-<span id="chessContainer1"></span>
-<span id="chessContainer2"></span>
+<div>
+    <button id="undoBtn1">undo</button>
+    <button id="redoBtn1">redo</button>
+    <div id="chessContainer1"></div>
+</div>
+<div id="chessContainer2"></div>
 
 <script type="text/javascript">
 	thin.ready(function () {
@@ -23,8 +27,16 @@
 			"chess/controller"], function () {
 			var controller = thin.use("Chess.Controller");
 
-			controller.init(document.getElementById("chessContainer1"));
-			controller.init(document.getElementById("chessContainer2"));
+			var game1 = controller.init(document.getElementById("chessContainer1"));
+			var game2 = controller.init(document.getElementById("chessContainer2"));
+
+            document.getElementById("undoBtn1").onclick = function() {
+                game1.undo();
+            };
+
+            document.getElementById("redoBtn1").onclick = function() {
+                game1.redo();
+            };
 		});
 	}, 1);
 </script>
