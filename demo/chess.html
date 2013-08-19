@@ -11,11 +11,15 @@
 </head>
 <body>
 <div>
-    <button id="undoBtn1">undo</button>
+	<button id="undoBtn1">undo</button>
     <button id="redoBtn1">redo</button>
     <div id="chessContainer1"></div>
 </div>
-<div id="chessContainer2"></div>
+<div vm-model="Chess">
+	<button vm-click="undo">undo</button>
+	<button vm-click="redo">redo</button>
+	<div vm-model="Chess"></div>
+</div>
 
 <script type="text/javascript">
 	thin.ready(function () {
@@ -28,14 +32,9 @@
 			var controller = thin.use("Chess.Controller");
 
 			var game1 = controller.init(document.getElementById("chessContainer1"));
-			var game2 = controller.init(document.getElementById("chessContainer2"));
 
             document.getElementById("undoBtn1").onclick = function() {
                 game1.undo();
-            };
-
-            document.getElementById("redoBtn1").onclick = function() {
-                game1.redo();
             };
 		});
 	}, 1);

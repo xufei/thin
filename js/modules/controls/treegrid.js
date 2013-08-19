@@ -82,9 +82,34 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 
 		addNode: function(data, parent) {
 			parent = parent || this;
-			var node = new TreeNode(data, parent);;
+			var node = new TreeNode(data, parent);
 			parent.childNodes.push(node);
 			this.allNodes.push(node);
+
+			var frag = document.createDocumentFragment();
+			if (parent != this) {
+				if (parent.childNodes.length == 0) {
+					parent.dom.insertAdjacentElement("afterEnd", node.dom);
+				}
+				else {
+					parent.childNodes[parent.childNodes.length-1].dom.insertAdjacentElement("afterEnd", node.dom);
+				}
+			}
+			else {
+				frag.appendChild(node.dom);
+			}
+
+			if (data.children) {
+				for (var i = 0; i < data.children.length; i++) {
+					this.addNode(data.children[i], node);
+				}
+				node.expanded = true;
+			}
+
+			if (parent == this) {
+				this.tbody.appendChild(frag.firstChild);
+				frag = null;
+			}
 
 			var that = this;
 			node.on("selected", function (event) {
@@ -135,16 +160,6 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 	TreeNode.prototype = {
 		create: function () {
 			var dom = this.grid.template.cloneNode(true);
-
-			this.grid.tbody.appendChild(dom);
-
-			if (this.data.children) {
-				for (var i = 0; i < this.data.children.length; i++) {
-					this.addNode(this.data.children[i]);
-				}
-				this.expanded = true;
-			}
-
 			this.dom = dom;
 			this.checkbox = this.dom.querySelector("tr>td>input");
 
@@ -175,8 +190,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 
 			this.blankSpan = this.dom.childNodes[1].firstChild;
 
-			this.blankSpan.style.marginLeft = this.depth * 20;
-			this.dom.childNodes[1].firstChild.innerHTML = this.depth * 20;
+			this.blankSpan.style.marginLeft = this.depth * 20 + "px";
 			this.dom.childNodes[1].lastChild.innerHTML = this.data[this.grid.columns[0].field];
 			var dataArr = [];
 			for (var i = 1; i < this.grid.columns.length; i++) {
@@ -257,8 +271,9 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 		refresh: function (data) {
 			this.data = data;
 
-			for (var i = 0; i < this.grid.columns.length; i++) {
-				this.dom.childNodes[i].innerHTML = data[this.grid.columns[i].field] || "";
+			this.dom.childNodes[1].lastChild.innerHTML = this.data[this.grid.columns[0].field];
+			for (var i = 1; i < this.grid.columns.length; i++) {
+				this.dom.childNodes[i+1].innerHTML = data[this.grid.columns[i].field] || "";
 			}
 		}
 	}.extend(Observer);

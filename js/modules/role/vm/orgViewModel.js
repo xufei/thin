@@ -125,7 +125,7 @@ thin.define("OrgViewModel", ["TreeGrid"], function (TreeGrid) {
 
 		deleteClick: function () {
 			if (confirm("Sure?")) {
-				this.grid.removeRow(this.grid.selectedRow);
+				this.grid.removeRow(this.grid.selectedNode);
 			}
 		},
 
@@ -133,10 +133,10 @@ thin.define("OrgViewModel", ["TreeGrid"], function (TreeGrid) {
 			var data = this.getFormData();
 
 			if (this.state === "New") {
-				this.grid.insertRow(data);
+				this.grid.addNode(data, this.grid.selectedNode);
 			}
 			else if (this.state === "Modify") {
-				this.grid.selectedRow.refresh(data);
+				this.grid.selectedNode.refresh(data);
 			}
 			this.state = "View";
 			this.editing = false;
@@ -148,7 +148,7 @@ thin.define("OrgViewModel", ["TreeGrid"], function (TreeGrid) {
 			this.editing = false;
 			this.enableForm = false;
 
-			this.setFormData(this.grid.selectedRow.data);
+			this.setFormData(this.grid.selectedNode.data);
 		},
 
 		getFormData: function () {
