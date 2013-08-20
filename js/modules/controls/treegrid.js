@@ -86,29 +86,31 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			parent.childNodes.push(node);
 			this.allNodes.push(node);
 
-			var frag = document.createDocumentFragment();
 			if (parent != this) {
-				if (parent.childNodes.length == 0) {
+				var loadedNodes = 0;
+				for (var i=0; i<parent.childNodes.length; i++) {
+					if (parent.childNodes[i].domLoaded) {
+						loadedNodes++;
+					}
+				}
+
+				if (loadedNodes == 0) {
 					parent.dom.insertAdjacentElement("afterEnd", node.dom);
 				}
 				else {
-					parent.childNodes[parent.childNodes.length-1].dom.insertAdjacentElement("afterEnd", node.dom);
+					parent.childNodes[loadedNodes-1].dom.insertAdjacentElement("afterEnd", node.dom);
 				}
 			}
 			else {
-				frag.appendChild(node.dom);
+				this.tbody.appendChild(node.dom);
 			}
+			node.domLoaded = true;
 
 			if (data.children) {
 				for (var i = 0; i < data.children.length; i++) {
 					this.addNode(data.children[i], node);
 				}
 				node.expanded = true;
-			}
-
-			if (parent == this) {
-				this.tbody.appendChild(frag.firstChild);
-				frag = null;
 			}
 
 			var that = this;
@@ -123,6 +125,33 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 				target: this
 			};
 			this.fire(event);
+		},
+
+		removeNode: function(node) {
+			for (var i=0; i<node.childNodes.length; i++) {
+				this.removeNode(node.childNodes[i]);
+			}
+
+			this.tbody.removeChild(node.dom);
+
+			for (var i=0; i<node.parent.childNodes.length; i++) {
+				if (node.parent.childNodes[i] == node) {
+					node.parent.childNodes.splice(i, 1);
+					break;
+				}
+			}
+
+			for (var i=0; i<this.allNodes.length; i++) {
+				if (this.allNodes[i] == node) {
+					this.allNodes.splice(i, 1);
+					break;
+				}
+			}
+
+			if (this.selectedNode == node) {
+				this.selectedNode = null;
+			}
+			node.destroy();
 		},
 
 		select: function (node) {
@@ -153,6 +182,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 		this.parent = parent;
 		this.grid = parent.grid;
 		this.childNodes = [];
+		this.domLoaded = false;
 
 		this.create();
 	}
@@ -210,7 +240,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 		},
 
 		removeNode: function(node) {
-
+			this.grid.removeNode(node);
 		},
 
 		select: function (flag) {

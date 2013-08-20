@@ -125,7 +125,7 @@ thin.define("OrgViewModel", ["TreeGrid"], function (TreeGrid) {
 
 		deleteClick: function () {
 			if (confirm("Sure?")) {
-				this.grid.removeRow(this.grid.selectedNode);
+				this.grid.removeNode(this.grid.selectedNode);
 			}
 		},
 
