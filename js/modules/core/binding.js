@@ -109,12 +109,12 @@ thin.define("DOMBinding", [], function () {
 		});
 
 		/*
-		switch () {
-			case "TextInput": {
+		 switch () {
+		 case "TextInput": {
 
-			}
-		}
-		*/
+		 }
+		 }
+		 */
 		bindTextValue(element, key, vm);
 
 		function bindTextValue(el, key, model) {
@@ -129,7 +129,7 @@ thin.define("DOMBinding", [], function () {
 		}
 
 		function bindSelectValue() {
-			el.onchange = function() {
+			el.onchange = function () {
 				vm[key] = el.value;
 			}
 		}
@@ -142,7 +142,7 @@ thin.define("DOMBinding", [], function () {
 			var selectedValue = element.value;
 			element.innerHTML = null;
 
-			for (var i=0; i<value.length; i++) {
+			for (var i = 0; i < value.length; i++) {
 				var item = document.createElement("option");
 				item.innerHTML = value[i].label;
 				item.value = value[i].key;

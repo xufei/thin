@@ -174,7 +174,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 	}
 
 	DataGridItemRenderer.prototype = {
-		render: function(node, rowData, columnIndex, key) {
+		render: function (node, rowData, columnIndex, key) {
 			if (columnIndex == 0) {
 
 			}

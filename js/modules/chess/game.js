@@ -1,4 +1,4 @@
-thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText", "ChessFactory", "ChessBoard"], function (Observer, Color, Type, Text, Factory, ChessBoard) {
+thin.define("Chess.Game", ["Observer", "ChessColor", "ChessType", "ChessText", "ChessFactory", "ChessBoard"], function (Observer, Color, Type, Text, Factory, ChessBoard) {
 	//color, type, x, y
 	var chesses = [
 		[1, 7, 4, 9],
@@ -36,10 +36,7 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText"
 		[-1, 1, 8, 3]
 	];
 
-	var games = [];
-
 	function Game() {
-		this.id = games.length;
 		this.situation = [];
 		this.currentColor = Color.RED;
 		this.currentChess = null;
@@ -51,12 +48,22 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText"
 	}
 
 	Game.prototype = {
-		init: function (element) {
+		init: function () {
+			var element = this.chessBoardDiv;
+
+			for (var i = 0; i < 9; i++) {
+				this.situation[i] = [];
+			}
+
+			for (var i = 0; i < chesses.length; i++) {
+				this.createChess(chesses[i]);
+			}
+
 			var chessBoard = new ChessBoard();
 			chessBoard.game = this;
 			this.chessBoard = chessBoard;
 			chessBoard.drawBoard(element);
-			chessBoard.drawChesses();
+			chessBoard.drawAllChess();
 
 			var game = this;
 			chessBoard.on("chessClicked", function (event) {
@@ -69,22 +76,16 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText"
 				game.chessBoard.moveChess(game.currentChess.x, game.currentChess.y, event.x, event.y);
 				game.moveChess(game.currentChess, event.x, event.y, false);
 			});
+		},
 
-			game.on("click", function (event) {
-				var canGo = event.canGo;
-				var canKill = event.canKill;
-
-				chessBoard.clearBlank();
-				chessBoard.clearAttack();
-
-				for (var i = 0; i < canGo.length; i++) {
-					chessBoard.drawBlank(canGo[i].x, canGo[i].y);
-				}
-
-				for (var i = 0; i < canKill.length; i++) {
-					chessBoard.drawAttack(canKill[i].x, canKill[i].y);
-				}
-			});
+		destroy: function () {
+			this.situation = null;
+			this.currentChess = null;
+			this.undoList = null;
+			this.redoList = null;
+			this.chessUnderAttack = null;
+			this.chessBoard = null;
+			this.chessContainer.parentElement.removeChild(this.chessContainer);
 		},
 
 		createChess: function (data) {
@@ -198,15 +199,15 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText"
 					x: chess.x,
 					y: chess.y
 				},
-                dead: this.situation[newX][newY]
+				dead: this.situation[newX][newY]
 			};
 
-            if (isUndo) {
-                this.redoList.push(step);
-            }
-            else {
-                this.undoList.push(step);
-            }
+			if (isUndo) {
+				this.redoList.push(step);
+			}
+			else {
+				this.undoList.push(step);
+			}
 
 			this.situation[chess.x][chess.y] = null;
 			chess.x = newX;
@@ -220,10 +221,10 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText"
 			this.check();
 		},
 
-		check: function() {
-			for (var i=0; i<this.generals.length; i++) {
-				for (var j=0; j<this.situation.length; j++) {
-					for (var k=0; k<this.situation[j].length; k++) {
+		check: function () {
+			for (var i = 0; i < this.generals.length; i++) {
+				for (var j = 0; j < this.situation.length; j++) {
+					for (var k = 0; k < this.situation[j].length; k++) {
 						if (this.situation[j][k] && this.situation[j][k].canGo(this.generals[i].x, this.generals[i].y)) {
 							this.prompt("将军！");
 							return;
@@ -263,55 +264,30 @@ thin.define("Chess.Service", ["Observer", "ChessColor", "ChessType", "ChessText"
 			}
 
 			var text = chessText + numbers[step.from.x] + directions[direction * step.chess.color + 1] + numbers[stepLength];
-			console.log(text);
+			thin.log(text);
 		},
 
 		undo: function () {
 			if (this.undoList.length > 0) {
 				var step = this.undoList.pop();
-                this.chessBoard.moveChess(step.chess.x, step.chess.y, step.from.x, step.from.y);
-                this.moveChess(step.chess, step.from.x, step.from.y, true);
+				this.chessBoard.moveChess(step.chess.x, step.chess.y, step.from.x, step.from.y);
+				this.moveChess(step.chess, step.from.x, step.from.y, true);
 
-                if (step.dead) {
-                    this.situation[step.chess.x][step.chess.y] = step.dead;
-                    this.chessBoard.drawChess(step.dead);
-                }
+				if (step.dead) {
+					this.situation[step.chess.x][step.chess.y] = step.dead;
+					this.chessBoard.drawChess(step.dead);
+				}
 			}
 		},
 
-		redo:function () {
-            if (this.redoList.length > 0) {
-                var step = this.redoList.pop();
-                this.chessBoard.moveChess(step.chess.x, step.chess.y, step.from.x, step.from.y);
-                this.moveChess(step.chess, step.from.x, step.from.y);
-
-                if (step.dead) {
-                    this.situation[step.chess.x][step.chess.y] = step.dead;
-                    this.chessBoard.drawChess(step.dead);
-                }
-            }
+		redo: function () {
+			if (this.redoList.length > 0) {
+				var step = this.redoList.pop();
+				this.chessBoard.moveChess(step.chess.x, step.chess.y, step.from.x, step.from.y);
+				this.moveChess(step.chess, step.from.x, step.from.y);
+			}
 		}
 	}.extend(Observer);
 
-	var Service = {
-		createGame: function (data) {
-			data = data || chesses;
-
-			var game = new Game();
-
-			for (var i = 0; i < 9; i++) {
-				game.situation[i] = [];
-			}
-
-			for (var i = 0; i < data.length; i++) {
-				game.createChess(data[i]);
-			}
-
-			games[game.id] = game;
-
-			return game;
-		}
-	};
-
-	return Service;
+	return Game;
 });

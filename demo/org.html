@@ -29,14 +29,16 @@
 						<label class="control-label" for="inputName">Name</label>
 
 						<div class="controls">
-							<input type="text" id="inputName" placeholder="Name" vm-value="name" vm-enable="enableForm"/>
+							<input type="text" id="inputName" placeholder="Name" vm-value="name"
+							       vm-enable="enableForm"/>
 						</div>
 					</div>
 					<div class="control-group span6">
 						<label class="control-label" for="inputCode">Code</label>
 
 						<div class="controls">
-							<input type="text" id="inputCode" placeholder="code" vm-value="code" vm-enable="enableForm"/>
+							<input type="text" id="inputCode" placeholder="code" vm-value="code"
+							       vm-enable="enableForm"/>
 						</div>
 					</div>
 				</div>
@@ -57,8 +59,8 @@
 </div>
 
 <script type="text/javascript">
-	thin.require(["controls/treegrid", "role/vm/orgViewModel"], function() {
-		thin.fire({type:"ready"});
+	thin.require(["controls/treegrid", "role/vm/orgViewModel"], function () {
+		thin.fire({type: "ready"});
 	});
 </script>
 

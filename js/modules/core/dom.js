@@ -1,13 +1,13 @@
-thin.define("DOMSelector", [], function() {
+thin.define("DOMSelector", [], function () {
 	function DOM() {
 		this.elements = [];
 		this.eventMap = [];
 	}
 
 	DOM.prototype = {
-		attr: function(key, value) {
+		attr: function (key, value) {
 			if (arguments.length == 2) {
-				this.elements.forEach(function(element) {
+				this.elements.forEach(function (element) {
 					element.setAttribute(key, value);
 				});
 				return this;
@@ -19,35 +19,35 @@ thin.define("DOMSelector", [], function() {
 			}
 		},
 
-		addClass: function(className) {
-			this.elements.forEach(function(element) {
+		addClass: function (className) {
+			this.elements.forEach(function (element) {
 				element.classList.add(className);
 			});
 			return this;
 		},
 
-		removeClass: function(className) {
-			this.elements.forEach(function(element) {
+		removeClass: function (className) {
+			this.elements.forEach(function (element) {
 				element.classList.remove(className);
 			});
 			return this;
 		},
 
-		show: function() {
-			this.elements.forEach(function(element) {
+		show: function () {
+			this.elements.forEach(function (element) {
 				element.style.display = "";
 			});
 			return this;
 		},
 
-		hide: function() {
-			this.elements.forEach(function(element) {
+		hide: function () {
+			this.elements.forEach(function (element) {
 				element.style.display = "none";
 			});
 			return this;
 		},
 
-		on: function(eventType, handler) {
+		on: function (eventType, handler) {
 			switch (eventType) {
 				case "click":
 					this.click(handler);
@@ -56,48 +56,48 @@ thin.define("DOMSelector", [], function() {
 			return this;
 		},
 
-		off: function(eventType, handler) {
+		off: function (eventType, handler) {
 
 		},
 
-		click: function(handler) {
-			this.elements.forEach(function(element) {
+		click: function (handler) {
+			this.elements.forEach(function (element) {
 				thin.on.call(element, "click", handler);
 			});
 			return this;
 		},
 
-		querySelector: function(selector) {
+		querySelector: function (selector) {
 
 		}
 	};
 
 	var DOMSelector = {
-		byId: function(id) {
+		byId: function (id) {
 			var dom = new DOM();
 			dom.elements.push(document.getElementById(id));
 
 			return dom;
 		},
 
-		byName: function(name) {
+		byName: function (name) {
 			var dom = new DOM();
 			dom.elements = [].slice.call(document.getElementsByName(name));
 			return dom;
 		},
 
-		byTagName: function(tagName) {
+		byTagName: function (tagName) {
 			var dom = new DOM();
 			dom.elements = [].slice.call(document.getElementsByTagName(tagName));
 			return dom;
 		},
 
-		bySelector: function(selector) {
+		bySelector: function (selector) {
 			var dom = new DOM();
 			dom.elements = [].slice.call(document.querySelector(selector));
 			return dom;
 		}
 	};
 
-	return DOMSelector;	
+	return DOMSelector;
 });

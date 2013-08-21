@@ -27,12 +27,12 @@
 	thin.require(["core/dom"], function () {
 		var DOMSelector = thin.use("DOMSelector");
 
-		DOMSelector.byId("showBtn").on("click", function() {
+		DOMSelector.byId("showBtn").on("click", function () {
 			DOMSelector.byId("test").show();
 			DOMSelector.byName("testRadio").show();
 		});
 
-		DOMSelector.byId("hideBtn").on("click", function() {
+		DOMSelector.byId("hideBtn").on("click", function () {
 			DOMSelector.byId("test").hide();
 			DOMSelector.byName("testRadio").hide();
 		});

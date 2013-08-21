@@ -32,8 +32,8 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			this.checkbox = checkbox;
 
 			var that = this;
-			checkbox.onclick = function() {
-				for (var i=0; i<that.allNodes.length; i++) {
+			checkbox.onclick = function () {
+				for (var i = 0; i < that.allNodes.length; i++) {
 					that.allNodes[i].checkbox.checked = checkbox.checked;
 				}
 			};
@@ -60,9 +60,9 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			this.fire(event);
 		},
 
-		initTemplate: function() {
+		initTemplate: function () {
 			var tr = document.createElement("tr");
-			for (var i=0; i<=this.columns.length; i++) {
+			for (var i = 0; i <= this.columns.length; i++) {
 				var td = document.createElement("td");
 				tr.appendChild(td);
 			}
@@ -81,7 +81,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			this.template = tr;
 		},
 
-		addNode: function(data, parent) {
+		addNode: function (data, parent) {
 			parent = parent || this;
 			var node = new TreeNode(data, parent);
 			parent.childNodes.push(node);
@@ -89,7 +89,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 
 			if (parent != this) {
 				var loadedNodes = 0;
-				for (var i=0; i<parent.childNodes.length; i++) {
+				for (var i = 0; i < parent.childNodes.length; i++) {
 					if (parent.childNodes[i].domLoaded) {
 						loadedNodes++;
 					}
@@ -99,7 +99,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 					parent.dom.insertAdjacentElement("afterEnd", node.dom);
 				}
 				else {
-					parent.childNodes[loadedNodes-1].dom.insertAdjacentElement("afterEnd", node.dom);
+					parent.childNodes[loadedNodes - 1].dom.insertAdjacentElement("afterEnd", node.dom);
 				}
 			}
 			else {
@@ -128,21 +128,21 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			this.fire(event);
 		},
 
-		removeNode: function(node) {
-			for (var i=node.childNodes.length-1; i>=0; i--) {
+		removeNode: function (node) {
+			for (var i = node.childNodes.length - 1; i >= 0; i--) {
 				this.removeNode(node.childNodes[i]);
 			}
 
 			this.tbody.removeChild(node.dom);
 
-			for (var i=0; i<node.parent.childNodes.length; i++) {
+			for (var i = 0; i < node.parent.childNodes.length; i++) {
 				if (node.parent.childNodes[i] == node) {
 					node.parent.childNodes.splice(i, 1);
 					break;
 				}
 			}
 
-			for (var i=0; i<this.allNodes.length; i++) {
+			for (var i = 0; i < this.allNodes.length; i++) {
 				if (this.allNodes[i] == node) {
 					this.allNodes.splice(i, 1);
 					break;
@@ -195,11 +195,11 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			this.checkbox = this.dom.querySelector("tr>td>input");
 
 			var that = this;
-			this.checkbox.onclick = function() {
+			this.checkbox.onclick = function () {
 				that.check(that.checkbox.checked);
 			};
 
-			this.dom.querySelector("tr>td>i").onclick = function() {
+			this.dom.querySelector("tr>td>i").onclick = function () {
 				if (that.expanded) {
 					that.collapse();
 				}
@@ -225,7 +225,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			this.dom.childNodes[1].lastChild.innerHTML = this.data[this.grid.columns[0].field];
 
 			for (var i = 1; i < this.grid.columns.length; i++) {
-				this.dom.childNodes[i+1].innerHTML = this.grid.itemRenderer.render(this, this.data, i, this.grid.columns[i].field);
+				this.dom.childNodes[i + 1].innerHTML = this.grid.itemRenderer.render(this, this.data, i, this.grid.columns[i].field);
 			}
 		},
 
@@ -239,7 +239,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			this.grid.addNode(data, this);
 		},
 
-		removeNode: function(node) {
+		removeNode: function (node) {
 			this.grid.removeNode(node);
 		},
 
@@ -263,33 +263,33 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 			}
 		},
 
-		show: function() {
+		show: function () {
 			this.dom.style.display = "";
 			this.expand();
 		},
 
-		hide: function() {
+		hide: function () {
 			this.dom.style.display = "none";
 			this.collapse();
 		},
 
-		expand: function() {
-			for (var i=0; i<this.childNodes.length; i++) {
+		expand: function () {
+			for (var i = 0; i < this.childNodes.length; i++) {
 				this.childNodes[i].show();
 			}
 			this.expanded = true;
 		},
 
-		collapse: function() {
-			for (var i=0; i<this.childNodes.length; i++) {
+		collapse: function () {
+			for (var i = 0; i < this.childNodes.length; i++) {
 				this.childNodes[i].hide();
 			}
 			this.expanded = false;
 		},
 
-		check: function(flag) {
+		check: function (flag) {
 			this.checkbox.checked = flag;
-			for (var i=0; i<this.childNodes.length; i++) {
+			for (var i = 0; i < this.childNodes.length; i++) {
 				this.childNodes[i].check(flag);
 			}
 		},
@@ -303,7 +303,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 
 			this.dom.childNodes[1].lastChild.innerHTML = this.data[this.grid.columns[0].field];
 			for (var i = 1; i < this.grid.columns.length; i++) {
-				this.dom.childNodes[i+1].innerHTML = this.grid.itemRenderer.render(this, data, i, this.grid.columns[i].field);
+				this.dom.childNodes[i + 1].innerHTML = this.grid.itemRenderer.render(this, data, i, this.grid.columns[i].field);
 			}
 		}
 	}.extend(Observer);
@@ -313,7 +313,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 	}
 
 	TreeGridItemRenderer.prototype = {
-		render: function(node, rowData, columnIndex, key) {
+		render: function (node, rowData, columnIndex, key) {
 			if (columnIndex == 0) {
 
 			}

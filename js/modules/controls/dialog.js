@@ -1,15 +1,15 @@
 thin.define("Dialog", [], function () {
 
-	var Dialog = function() {
+	var Dialog = function () {
 
 	};
 
 	Dialog.prototype = {
-		show: function() {
+		show: function () {
 
 		},
 
-		hide: function() {
+		hide: function () {
 
 		}
 	};

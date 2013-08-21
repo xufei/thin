@@ -11,32 +11,35 @@
 </head>
 <body>
 
-<div>
-	<button id="undoBtn1">undo</button>
-    <button id="redoBtn1">redo</button>
-    <div id="chessContainer1"></div>
-</div>
-<div vm-model="Chess">
-	<button vm-click="undo">undo</button>
-	<button vm-click="redo">redo</button>
-	<div vm-model="Chess"></div>
-</div>
+<script id="chessTemplate" type="thin/template">
+	<div vm-model="Chess.Game" vm-init="init" vm-element="chessContainer">
+		<button vm-click="undo">undo</button>
+		<button vm-click="redo">redo</button>
+		<button vm-click="destroy">remove this</button>
+		<div vm-element="chessBoardDiv"></div>
+	</div>
+</script>
+
+<button id="createBtn">Create New Game</button>
 
 <script type="text/javascript">
 	thin.ready(function () {
 		thin.require(["chess/config",
-			"chess/service",
+			"chess/game",
 			"chess/chessman",
 			"chess/factory",
-			"chess/chessboard",
-			"chess/controller"], function () {
-			var controller = thin.use("Chess.Controller");
+			"chess/chessboard"], function () {
+			var template = document.getElementById("chessTemplate").firstChild;
 
-			var game1 = controller.init(document.getElementById("chessContainer1"));
-
-            document.getElementById("undoBtn1").onclick = function() {
-                game1.undo();
-            };
+			document.getElementById("createBtn").onclick = function () {
+				thin.require(["core/binding"], function () {
+					var binding = thin.use("DOMBinding");
+					var div = document.createElement("div");
+					div.innerHTML = template.data;
+					document.body.appendChild(div);
+					binding.parse(div);
+				});
+			};
 		});
 	}, 1);
 </script>

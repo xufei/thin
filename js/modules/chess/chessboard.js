@@ -98,58 +98,58 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
 			}
 		},
 
-        drawChess: function(chess) {
-            if (chess) {
-                var x = offsetX + gridSize * chess.x;
-                var y = offsetY + gridSize * chess.y;
+		drawChess: function (chess) {
+			if (chess) {
+				var x = offsetX + gridSize * chess.x;
+				var y = offsetY + gridSize * chess.y;
 
-                var group = this.paper.set();
+				var group = this.paper.set();
 
-                var bound = this.paper.circle(x, y, 0.4 * gridSize);
-                bound.attr({
-                    "stroke-width": 3,
-                    "fill": "#eeeeee"
-                });
+				var bound = this.paper.circle(x, y, 0.4 * gridSize);
+				bound.attr({
+					"stroke-width": 3,
+					"fill": "#eeeeee"
+				});
 
-                var label = this.paper.text(x, y, ChessText[chess.type + (chess.color + 1) * 7 / 2]);
-                var color = chess.color == ChessColor.RED ? "red" : "black";
-                label.attr({
-                    "font-size": 0.6 * gridSize,
-                    "font-family": "楷体, 宋体, 新宋体",
-                    "fill": color
-                });
+				var label = this.paper.text(x, y, ChessText[chess.type + (chess.color + 1) * 7 / 2]);
+				var color = chess.color == ChessColor.RED ? "red" : "black";
+				label.attr({
+					"font-size": 0.6 * gridSize,
+					"font-family": "楷体, 宋体, 新宋体",
+					"fill": color
+				});
 
-                group.push(bound);
-                group.push(label);
-                group.attr({
-                    "cursor": "pointer"
-                });
+				group.push(bound);
+				group.push(label);
+				group.attr({
+					"cursor": "pointer"
+				});
 
-                var that = this;
-                group.click((function (context) {
-                    return function () {
-                        var evt = {
-                            type: "chessClicked",
-                            chess: context
-                        };
-                        that.fire(evt);
-                    };
-                })(chess));
+				var that = this;
+				group.click((function (context) {
+					return function () {
+						var evt = {
+							type: "chessClicked",
+							chess: context
+						};
+						that.fire(evt);
+					};
+				})(chess));
 
-                this.chesses[chess.x][chess.y] = {
-                    group: group,
-                    bound: bound,
-                    label: label
-                };
-            }
+				this.chesses[chess.x][chess.y] = {
+					group: group,
+					bound: bound,
+					label: label
+				};
+			}
 
-        },
+		},
 
-		drawChesses: function () {
+		drawAllChess: function () {
 			for (var i = 0; i < 9; i++) {
 				for (var j = 0; j < 10; j++) {
-                    this.drawChess(this.game.getChess(i, j));
-                }
+					this.drawChess(this.game.getChess(i, j));
+				}
 			}
 		},
 
@@ -176,7 +176,6 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
 			this.chesses[x][y].label.remove();
 			this.chesses[x][y].group.remove();
 
-			//this.chesses[x][y].off();
 			this.chesses[x][y] = null;
 		},
 

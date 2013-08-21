@@ -111,7 +111,7 @@
 		},
 
 		require: function (pathArr, callback) {
-		    var base = this.base;
+			var base = this.base;
 			for (var i = 0; i < pathArr.length; i++) {
 				loadFile(pathArr[i]);
 			}
@@ -174,7 +174,7 @@
 		return Observer;
 	});
 
-	thin.on("ready", function() {
+	thin.on("ready", function () {
 		thin.require(["core/binding"], function () {
 			var binding = thin.use("DOMBinding");
 			binding.parse(doc.body);
