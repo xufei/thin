@@ -15,6 +15,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 		this.tbody = element.firstChild.tBodies[0];
 
 		this.selectedNode = null;
+		this.itemRenderer = new TreeGridItemRenderer(this);
 	};
 
 	TreeGrid.prototype = {
@@ -185,7 +186,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 		this.domLoaded = false;
 
 		this.create();
-	}
+	};
 
 	TreeNode.prototype = {
 		create: function () {
@@ -222,10 +223,9 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 
 			this.blankSpan.style.marginLeft = this.depth * 20 + "px";
 			this.dom.childNodes[1].lastChild.innerHTML = this.data[this.grid.columns[0].field];
-			var dataArr = [];
+
 			for (var i = 1; i < this.grid.columns.length; i++) {
-				dataArr[i] = this.data[this.grid.columns[i].field];
-				this.dom.childNodes[i+1].innerHTML = dataArr[i];
+				this.dom.childNodes[i+1].innerHTML = this.grid.itemRenderer.render(this, this.data, i, this.grid.columns[i].field);
 			}
 		},
 
@@ -303,10 +303,25 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 
 			this.dom.childNodes[1].lastChild.innerHTML = this.data[this.grid.columns[0].field];
 			for (var i = 1; i < this.grid.columns.length; i++) {
-				this.dom.childNodes[i+1].innerHTML = data[this.grid.columns[i].field] || "";
+				this.dom.childNodes[i+1].innerHTML = this.grid.itemRenderer.render(this, data, i, this.grid.columns[i].field);
 			}
 		}
 	}.extend(Observer);
+
+	function TreeGridItemRenderer(grid) {
+		this.grid = grid;
+	}
+
+	TreeGridItemRenderer.prototype = {
+		render: function(node, rowData, columnIndex, key) {
+			if (columnIndex == 0) {
+
+			}
+			else {
+				return rowData[key] || "";
+			}
+		}
+	};
 
 	return TreeGrid;
 });

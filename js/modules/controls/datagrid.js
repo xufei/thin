@@ -1,5 +1,4 @@
 thin.define("DataGrid", ["Observer"], function (Observer) {
-	//作为一个控件，它的容器必须传入
 	var DataGrid = function (element) {
 		this.columns = [];
 		this.rows = [];
@@ -10,7 +9,9 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 		this.tbody = element.firstChild.tBodies[0];
 
 		this.selectedRow = null;
-	}
+
+		this.itemRenderer = new DataGridItemRenderer(this);
+	};
 
 	DataGrid.prototype = {
 		loadColumns: function (columns) {
@@ -31,7 +32,6 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 				this.insertRow(data[i]);
 			}
 
-			//跟外面说一声，数据加载好了
 			var event = {
 				type: "loadCompleted",
 				target: this
@@ -50,7 +50,6 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 				that.select(event.row);
 			});
 
-			//已经成功添加了新行
 			var event = {
 				type: "rowInserted",
 				newRow: row,
@@ -74,7 +73,6 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 				}
 			}
 
-			//已经移除
 			var event = {
 				type: "rowRemoved",
 				target: this
@@ -109,21 +107,20 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 		this.grid = grid;
 
 		this.create();
-	}
+	};
 
 	DataRow.prototype = {
 		create: function () {
 			var row = document.createElement("tr");
 			for (var i = 0; i < this.grid.columns.length; i++) {
 				var cell = document.createElement("td");
-				cell.innerHTML = this.data[this.grid.columns[i].field] || "";
+				cell.innerHTML = this.grid.itemRenderer.render(this, this.data, i, this.grid.columns[i].field);
 				row.appendChild(cell);
 			}
 			this.dom = row;
 
 			var that = this;
 			row.onclick = function (event) {
-				//通知上级，我被点了
 				var newEvent = {
 					type: "selected",
 					target: that,
@@ -167,10 +164,25 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			this.data = data;
 
 			for (var i = 0; i < this.grid.columns.length; i++) {
-				this.dom.childNodes[i].innerHTML = data[this.grid.columns[i].field] || "";
+				this.dom.childNodes[i].innerHTML = this.grid.itemRenderer.render(this, data, i, this.grid.columns[i].field);
 			}
 		}
 	}.extend(Observer);
+
+	function DataGridItemRenderer(grid) {
+		this.grid = grid;
+	}
+
+	DataGridItemRenderer.prototype = {
+		render: function(node, rowData, columnIndex, key) {
+			if (columnIndex == 0) {
+
+			}
+			else {
+				return rowData[key] || "";
+			}
+		}
+	};
 
 	return DataGrid;
 });
