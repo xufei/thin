@@ -128,7 +128,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 		},
 
 		removeNode: function(node) {
-			for (var i=0; i<node.childNodes.length; i++) {
+			for (var i=node.childNodes.length-1; i>=0; i--) {
 				this.removeNode(node.childNodes[i]);
 			}
 

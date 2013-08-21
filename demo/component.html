@@ -29,8 +29,7 @@
 
 	thin.ready(function () {
 		thin.require(["../js/modules/core/binding",
-			"../js/modules/core/remote",
-			"../js/modules/core/utils"], function () {
+			"../js/modules/core/remote"], function () {
 			var component = thin.use("Component");
 			component.load("partial/form.html");
 		});
