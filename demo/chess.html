@@ -11,30 +11,28 @@
 </head>
 <body>
 
-<script id="chessTemplate" type="thin/template">
+<div id="chessTemplate" style="display: none">
 	<div vm-model="Chess.Game" vm-init="init" vm-element="chessContainer">
 		<button vm-click="undo">undo</button>
 		<!--button vm-click="redo">redo</button-->
 		<button vm-click="destroy">remove current game</button>
 		<div vm-element="chessBoardDiv"></div>
 	</div>
-</script>
+</div>
 
 <button id="createBtn">Create New Game</button>
 
 <script type="text/javascript">
 	thin.ready(function () {
-		thin.require(["chess/config", "chess/game",	"chess/chessman", "chess/chessboard"], function () {
-			var template = document.getElementById("chessTemplate").firstChild;
+		thin.require(["chess/config", "chess/game",	"chess/chessman", "chess/chessboard", "core/binding"], function () {
+			var template = document.getElementById("chessTemplate");
 
 			document.getElementById("createBtn").onclick = function () {
-				thin.require(["core/binding"], function () {
-					var binding = thin.use("DOMBinding");
-					var div = document.createElement("div");
-					div.innerHTML = template.data;
-					document.body.appendChild(div);
-					binding.parse(div);
-				});
+				var binding = thin.use("DOMBinding");
+				var div = document.createElement("div");
+				div.innerHTML = template.innerHTML;
+				document.body.appendChild(div);
+				binding.parse(div);
 			};
 		});
 	}, 1);
