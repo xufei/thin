@@ -14,8 +14,8 @@
 <script id="chessTemplate" type="thin/template">
 	<div vm-model="Chess.Game" vm-init="init" vm-element="chessContainer">
 		<button vm-click="undo">undo</button>
-		<button vm-click="redo">redo</button>
-		<button vm-click="destroy">remove this</button>
+		<!--button vm-click="redo">redo</button-->
+		<button vm-click="destroy">remove current game</button>
 		<div vm-element="chessBoardDiv"></div>
 	</div>
 </script>
@@ -24,11 +24,7 @@
 
 <script type="text/javascript">
 	thin.ready(function () {
-		thin.require(["chess/config",
-			"chess/game",
-			"chess/chessman",
-			"chess/factory",
-			"chess/chessboard"], function () {
+		thin.require(["chess/config", "chess/game",	"chess/chessman", "chess/chessboard"], function () {
 			var template = document.getElementById("chessTemplate").firstChild;
 
 			document.getElementById("createBtn").onclick = function () {
