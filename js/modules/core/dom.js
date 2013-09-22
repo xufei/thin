@@ -1,10 +1,10 @@
 thin.define("DOMSelector", [], function () {
-	function DOM() {
+	function DOMWrapper() {
 		this.elements = [];
 		this.eventMap = [];
 	}
 
-	DOM.prototype = {
+	DOMWrapper.prototype = {
 		attr: function (key, value) {
 			if (arguments.length == 2) {
 				this.elements.forEach(function (element) {
@@ -81,21 +81,113 @@ thin.define("DOMSelector", [], function () {
 		},
 
 		byName: function (name) {
-			var dom = new DOM();
+			var dom = new DOMWrapper();
 			dom.elements = [].slice.call(document.getElementsByName(name));
 			return dom;
 		},
 
 		byTagName: function (tagName) {
-			var dom = new DOM();
+			var dom = new DOMWrapper();
 			dom.elements = [].slice.call(document.getElementsByTagName(tagName));
 			return dom;
 		},
 
 		bySelector: function (selector) {
-			var dom = new DOM();
+			var dom = new DOMWrapper();
 			dom.elements = [].slice.call(document.querySelector(selector));
 			return dom;
+		},
+
+		create: function(emmet) {
+			var tree = new ExpressionTree(emmet);
+		}
+	};
+
+	// todo, implement an emmet creator
+
+	var EmmetOperators = {
+		Child: ">",
+		Sibling: "+",
+		Climb: "^",
+		Multiplication: "*",
+		GroupOpen: "(",
+		GroupClose: ")",
+		ID: "#",
+		Class: ".",
+		AttributeOpen: "[",
+		AttributeClose: "]",
+		TextOpen: "{",
+		TextClose: "}"
+	};
+
+	var EmmetFunctions = {
+		">": function(){},
+		"+": function(){},
+		"^": function(){},
+		"*": function(){},
+		"(": function(){},
+		")": function(){},
+		"#": function(){},
+		".": function(){},
+		"[": function(){},
+		"]": function(){},
+		"{": function(){},
+		"}": function(){}
+	};
+
+	var EmmetParser = {
+		currentIndex: 0,
+		groupStack: [],
+		attrStack: [],
+		textStack: [],
+
+		isOperator: function(char) {
+
+		},
+
+		readOperator: function() {
+
+		},
+
+		readString: function() {
+
+		},
+
+		readNumber: function() {
+			var number = "";
+			var start = this.currentIndex;
+			while (this.currentIndex < this.text.length) {
+				var diff = this.text.charCodeAt(this.currentIndex) - 49;
+				if (diff >= 0 && diff <= 9) {
+					number += this.text.charAt(this.currentIndex);
+				}
+				else {
+					break;
+				}
+				this.currentIndex++;
+			}
+			number = 1 * number;
+			return number;
+		},
+
+		parseString: function(text) {
+			this.str = text;
+			var tokens = [];
+			for (var i=0; i<text.length; i++) {
+				if (this.isOperator(text.charAt(i))) {
+					tokens.push(text.charAt(i));
+				}
+			}
+		}
+	};
+
+	var ExpressionTree = function(expression) {
+		this.expression = expression;
+	};
+
+	ExpressionTree.prototype = {
+		generateTree: function() {
+
 		}
 	};
 

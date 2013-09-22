@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Wizard</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Wizard, binding">
+	<meta name="author" content="xu.fei@outlook.com">
+
+	<link rel="stylesheet" href="http://libs.baidu.com/bootstrap/2.0.4/css/bootstrap.min.css"/>
+	<script type="text/javascript" src="../js/thin.js"></script>
+</head>
+<body>
+<div class="span12" vm-model="Euclid" vm-init="init">
+	<div class="header">
+		<h3>Staff Management with binding</h3>
+	</div>
+	<div>
+		<input vm-value="a"/>
+		<input vm-value="b"/>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" vm-click="execute"><i class="icon-ok icon-white"></i>Next</button>
+	</div>
+</div>
+
+<script type="text/javascript">
+	thin.define("StateMachine", [], function() {
+		var StateMachine = function() {
+			this.name = "State Machine";
+			this.states = {};
+			this.transitions = [];
+
+			this.startState = this.addState("Start");
+			this.finishState = this.addState("Finish");
+
+			this.currentState = this.startState;
+		};
+
+		StateMachine.prototype = {
+			load: function(data) {
+				for (var i=0; i<data.states.length; i++) {
+					this.addState(data.states[i]);
+				}
+			},
+
+			execute: function() {
+				this.currentState.execute();
+
+				for (var i=0; i<this.transitions.length; i++) {
+					if (this.transitions[i].from == this.currentState) {
+						if (this.transitions[i].evaluate()) {
+							this.currentState = this.transitions[i].to;
+							break;
+						}
+					}
+				}
+			},
+
+			addState: function(name) {
+				var state = new State(name);
+
+				state.stateMachine = this;
+				this.states[name] = state;
+
+				return state;
+			},
+
+			addTransition: function(data) {
+				var transition = new Transition(data);
+
+				transition.stateMachine = this;
+				this.transitions.push(transition);
+				transition.from = this.states[data.from];
+				transition.to = this.states[data.to];
+
+				return transition;
+			},
+
+			isFinished: function() {
+				return this.currentState == this.finishState;
+			}
+		};
+
+		var State = function(name) {
+			this.name = name;
+
+			this.stateMachine = null;
+			this.functions = [];
+		};
+
+		State.prototype = {
+			addFunction: function(func) {
+				this.functions.push(func);
+				func.state = this;
+			},
+
+			execute: function() {
+				for (var i=0; i<this.functions.length; i++) {
+					this.functions[i].call(this.stateMachine);
+				}
+			}
+		};
+
+		var Transition = function(data) {
+			this.name = data.name || "Transition";
+			this.condition = data.condition;
+
+			this.stateMachine = null;
+		};
+
+		Transition.prototype = {
+			evaluate: function() {
+				if (!this.condition) {
+					return true;
+				}
+				else {
+					return this.condition.call(this.stateMachine);
+				}
+			}
+		};
+
+		return StateMachine;
+	});
+
+	thin.define("Euclid", ["StateMachine"], function(StateMachine) {
+		var Euclid = function() {
+		};
+
+		Euclid.prototype = new StateMachine().extend({
+			init: function() {
+				this.startState.addFunction(function() {
+					this.a = 30;
+					this.b = 72;
+				});
+
+				var prepare = this.addState("prepare");
+				prepare.addFunction(function() {
+					if (this.a < this.b) {
+						var temp = this.a;
+						this.a = this.b;
+						this.b = temp;
+					}
+				});
+
+				var execute = this.addState("execute");
+				execute.addFunction(function() {
+					var temp = this.a % this.b;
+					this.a = this.b;
+					this.b = temp;
+				});
+
+				this.addTransition({
+					from: "Start",
+					to: "prepare"
+				});
+
+				this.addTransition({
+					from: "prepare",
+					to: "execute"
+				});
+
+				this.addTransition({
+					from: "execute",
+					to: "execute",
+					condition: function() {
+						return (this.a % this.b != 0);
+					}
+				});
+
+				this.addTransition({
+					from: "execute",
+					to: "Finish",
+					condition: function() {
+						return (this.a % this.b == 0);
+					}
+				});
+			}
+		});
+
+		return Euclid;
+	});
+
+	thin.fire({type: "ready"});
+</script>
+
+</body>
+</html>

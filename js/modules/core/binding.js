@@ -168,23 +168,37 @@ thin.define("DOMBinding", [], function () {
 
 		element.onclick = function () {
 			vm[key]();
-		}
+		};
 	}
 
 	function bindEnable(element, key, vm, direction) {
 		thin.log("binding enable: " + key);
 
-		vm.$watch(key, function (value, oldValue) {
-			element.disabled = value ^ direction ? true : false;
-		});
+		if (typeof vm[key] == "function") {
+			thin.schedule(function() {
+				element.disabled = vm[key]() ^ direction ? true : false;
+			});
+		}
+		else {
+			vm.$watch(key, function (value, oldValue) {
+				element.disabled = value ^ direction ? true : false;
+			});
+		}
 	}
 
 	function bindVisible(element, key, vm, direction) {
 		thin.log("binding visible: " + key);
 
-		vm.$watch(key, function (value, oldValue) {
-			element.style.display = value ^ direction ? "none" : "";
-		});
+		if (typeof vm[key] == "function") {
+			thin.schedule(function() {
+				element.style.display = vm[key]() ^ direction ? "none" : "";
+			});
+		}
+		else {
+			vm.$watch(key, function (value, oldValue) {
+				element.style.display = value ^ direction ? "none" : "";
+			});
+		}
 	}
 
 	return {

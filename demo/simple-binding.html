@@ -19,7 +19,9 @@
 <div vm-model="test.Person" vm-init="init">
 	<input type="text" vm-value="name"/>
 	<input type="text" vm-value="age"/>
-	<input type="button" vm-click="growUp" value="Grow Up"/>
+	<input type="button" value="Grow Up" vm-click="growUp"/>
+	<input type="button" value="Adult" vm-enable="isAdult" vm-click="greet"/>
+	<input type="button" value="Drink" vm-visible="isAdult" vm-click="drink"/>
 </div>
 <script type="text/javascript">
 	thin.define("test.Person", [], function () {
@@ -36,6 +38,18 @@
 
 			growUp: function () {
 				this.age++;
+			},
+
+			isAdult: function() {
+				return this.age >= 18;
+			},
+
+			greet: function() {
+				alert("I am " + this.age + " years old");
+			},
+
+			drink: function() {
+				alert("A bottle of wine!");
 			}
 		};
 
