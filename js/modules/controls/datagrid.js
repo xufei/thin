@@ -1,5 +1,5 @@
 thin.define("DataGrid", ["Observer"], function (Observer) {
-	var DataGrid = function (element) {
+	var DataGrid = function (element, config) {
 		this.columns = [];
 		this.rows = [];
 
@@ -10,7 +10,9 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 
 		this.selectedRow = null;
 
-		this.itemRenderer = new DataGridItemRenderer(this);
+		if (config && config.showCheckbox) {
+			this.itemRenderer = CheckboxRenderer;
+		}
 	};
 
 	DataGrid.prototype = {
@@ -114,7 +116,19 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			var row = document.createElement("tr");
 			for (var i = 0; i < this.grid.columns.length; i++) {
 				var cell = document.createElement("td");
-				cell.innerHTML = this.grid.itemRenderer.render(this, this.data, i, this.grid.columns[i].field);
+
+				if (this.grid.columns[i].itemRenderer) {
+					cell.appendChild(this.grid.columns[i].itemRenderer(this.data, this.grid.columns[i].field, i));
+				}
+				else if (this.grid.columns[i].labelFunction) {
+					cell.innerHTML = this.grid.columns[i].labelFunction(this.data, this.grid.columns[i].field);
+				}
+				else if (this.grid.itemRenderer) {
+					cell.appendChild(this.grid.itemRenderer(this.data, this.grid.columns[i].field, i));
+				}
+				else {
+					cell.innerHTML = this.data[this.grid.columns[i].field];
+				}
 				row.appendChild(cell);
 			}
 			this.dom = row;
@@ -169,20 +183,25 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 		}
 	}.extend(Observer);
 
-	function DataGridItemRenderer(grid) {
-		this.grid = grid;
-	}
+	function CheckboxRenderer(data, key, columnIndex) {
+		if (columnIndex == 0) {
+			var div = document.createElement("div");
+			var checkbox = document.createElement("input");
+			checkbox.type = "checkbox";
+			div.appendChild(checkbox);
 
-	DataGridItemRenderer.prototype = {
-		render: function (node, rowData, columnIndex, key) {
-			if (columnIndex == 0) {
+			var span = document.createElement("span");
+			span.innerHTML = data[key];
+			div.appendChild(span);
 
-			}
-			else {
-				return rowData[key] || "";
-			}
+			return div;
 		}
-	};
+		else {
+			var span = document.createElement("span");
+			span.innerHTML = data[key];
+			return span;
+		}
+	}
 
 	return DataGrid;
 });
