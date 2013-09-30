@@ -12,8 +12,9 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 
 		if (config && config.showCheckbox) {
 			this.itemRenderer = CheckboxRenderer;
+			this.headerRenderer = HeaderRenderer;
 		}
-	};
+	}
 
 	DataGrid.prototype = {
 		loadColumns: function (columns) {
@@ -24,7 +25,16 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 
 			for (var i = 0; i < columns.length; i++) {
 				var th = tr.insertCell(i);
-				th.innerHTML = columns[i].label;
+
+				if (columns[i].headerRenderer) {
+					th.appendChild(columns[i].headerRenderer(columns[i].field, i));
+				}
+				else if (this.headerRenderer) {
+					th.appendChild(this.headerRenderer(columns[i].field, i));
+				}
+				else {
+					th.innerHTML = columns[i].label;
+				}
 			}
 			this.columns = columns;
 		},
@@ -116,19 +126,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			var row = document.createElement("tr");
 			for (var i = 0; i < this.grid.columns.length; i++) {
 				var cell = document.createElement("td");
-
-				if (this.grid.columns[i].itemRenderer) {
-					cell.appendChild(this.grid.columns[i].itemRenderer(this.data, this.grid.columns[i].field, i));
-				}
-				else if (this.grid.columns[i].labelFunction) {
-					cell.innerHTML = this.grid.columns[i].labelFunction(this.data, this.grid.columns[i].field);
-				}
-				else if (this.grid.itemRenderer) {
-					cell.appendChild(this.grid.itemRenderer(this.data, this.grid.columns[i].field, i));
-				}
-				else {
-					cell.innerHTML = this.data[this.grid.columns[i].field];
-				}
+				this.render(cell, this.data, this.grid.columns[i].field, i);
 				row.appendChild(cell);
 			}
 			this.dom = row;
@@ -174,11 +172,26 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			return this.data[key];
 		},
 
+		render: function(cell, data, field, index) {
+			if (this.grid.columns[index].itemRenderer) {
+				cell.appendChild(this.grid.columns[index].itemRenderer(data, field, index));
+			}
+			else if (this.grid.columns[index].labelFunction) {
+				cell.innerHTML = this.grid.columns[index].labelFunction(data, field);
+			}
+			else if (this.grid.itemRenderer) {
+				cell.appendChild(this.grid.itemRenderer(data, field, index));
+			}
+			else {
+				cell.innerHTML = data[field];
+			}
+		},
+
 		refresh: function (data) {
 			this.data = data;
 
 			for (var i = 0; i < this.grid.columns.length; i++) {
-				this.dom.childNodes[i].innerHTML = this.grid.itemRenderer.render(this, data, i, this.grid.columns[i].field);
+				this.render(this.dom.childNodes[i], data, this.grid.columns[i].field, i);
 			}
 		}
 	}.extend(Observer);
@@ -188,6 +201,11 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			var div = document.createElement("div");
 			var checkbox = document.createElement("input");
 			checkbox.type = "checkbox";
+			checkbox.checked = data["checked"];
+
+			checkbox.onclick = function() {
+				data["checked"] = !data["checked"];
+			};
 			div.appendChild(checkbox);
 
 			var span = document.createElement("span");
@@ -199,6 +217,30 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 		else {
 			var span = document.createElement("span");
 			span.innerHTML = data[key];
+			return span;
+		}
+	}
+
+	function HeaderRenderer(field, columnIndex) {
+		if (columnIndex == 0) {
+			var div = document.createElement("div");
+			var checkbox = document.createElement("input");
+			checkbox.type = "checkbox";
+			div.appendChild(checkbox);
+
+			checkbox.onclick = function() {
+
+			};
+
+			var span = document.createElement("span");
+			span.innerHTML = field;
+			div.appendChild(span);
+
+			return div;
+		}
+		else {
+			var span = document.createElement("span");
+			span.innerHTML = field;
 			return span;
 		}
 	}
