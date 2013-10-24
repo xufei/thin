@@ -13,6 +13,7 @@
 
 	{
 		name: "Tom",
+		age: 16,
 		gender: 1
 	}
 
@@ -20,6 +21,7 @@
 
 	{
 		name: "Tom",
+		age: 16,
 		gender: 1,
 		genderName: "Male"
 	}
@@ -34,6 +36,8 @@
 
 现在讨论的只是单个列需要处理，假如有多个，那更麻烦了，有没有什么更好的办法呢？
 
+##5.1 字段格式化
+
 我们可以把这个格式化功能提取到外面，然后注入进来。格式化的功能，至少应当是针对列的，所以可以附加到列的初始化信息里传递过来。考虑一下格式化函数的参数，至少需要原始值，但有些情况更加复杂，所以我们多给它一些信息，比如说，本行的完整数据，还有当前列的key值。这么一来，一个典型的格式化函数就有了：
 
 	function labelFunction(data, key) {
@@ -41,7 +45,52 @@
 		if (value == 0) {
 			return "Female";
 		}
-		else {
+		else if (value == 1) {
 			return "Male";
 		}
+		else {
+			return "Unknown"
+		}
 	}
+
+
+有了格式化，我们就可以很方便地进行一些显示的转换，比如对日需求，期、金额的实际值和显示值进行转换，或者，也可以显示一些图片和操作按钮之类。
+
+比如说：
+
+	function labelFunction(data, key) {
+		var value = data[key];
+		if (value > 18) {
+			return "<button>Click me, man</button>";
+		}
+		else {
+			return "Hi, boy, you can do nothing.";
+		}	
+	}
+
+上面这段代码是一个示例，我们可以指定当年龄大于18岁的时候出来一个按钮可点，不足18的时候只出来一段文字。看上去，这段代码也满足我们需要了，但它将会遇到问题。
+
+什么问题呢？我们来给这个按钮加个事件，点击它的时候，显示这个人的名字。考虑到我们输出的是HTML字符串，所以这个事件比较难加，除非也用字符串拼到里面，这么做是有很多弊端的，我们来考虑用一些优雅的方式解决。
+
+##5.2 单元格渲染器
+
+既然返回字符串不好，那我们直接一点，返回DOM结构如何？
+
+	function itemRenderer(data, key, columnIndex) {
+		if (data[key] >= 18) {
+			var btn = document.createElement("button");
+			btn.innerHTML = data[key];
+			btn.onclick = function() {
+				alert("I am " + data[key] + " years old, I want a bottle of wine!");
+			};
+
+			return btn;
+		}
+		else {
+			var span = document.createElement("span");
+			span.innerHTML = data[key];
+			return span;
+		}
+	}
+
+这样就好多了。

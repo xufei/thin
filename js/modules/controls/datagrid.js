@@ -174,12 +174,15 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 
 		render: function(cell, data, field, index) {
 			if (this.grid.columns[index].itemRenderer) {
+				cell.innerHTML = "";
 				cell.appendChild(this.grid.columns[index].itemRenderer(data, field, index));
 			}
 			else if (this.grid.columns[index].labelFunction) {
+				cell.innerHTML = "";
 				cell.innerHTML = this.grid.columns[index].labelFunction(data, field);
 			}
 			else if (this.grid.itemRenderer) {
+				cell.innerHTML = "";
 				cell.appendChild(this.grid.itemRenderer(data, field, index));
 			}
 			else {
