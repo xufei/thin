@@ -134,6 +134,27 @@
 		}, {
 			label: "Age",
 			field: "age",
+			headerRenderer: {
+				render: function (grid, field, columnIndex) {
+					var rows = grid.rows;
+					var div = document.createElement("div");
+
+					var span = document.createElement("span");
+					span.innerHTML = grid.columns[columnIndex].label;
+					div.appendChild(span);
+
+					span = document.createElement("span");
+
+					var totalAge = 0;
+					for (var i=0; i<grid.rows.length; i++) {
+						totalAge += (grid.rows[i].get("age") - 0);
+					}
+
+					span.innerHTML = "--totalAge:" + totalAge;
+					div.appendChild(span);
+					return div;
+				}
+			},
 			itemRenderer: {
 				render: function(grid, data, key, columnIndex) {
 					if (data[key] >= 18) {

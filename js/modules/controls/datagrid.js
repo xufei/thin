@@ -10,11 +10,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 
 		this.selectedRow = null;
 
-		if (config && config.showCheckbox) {
-			this.headerRenderer = HeaderRenderer;
-			this.itemRenderer = CheckboxRenderer;
-		}
-
+		this.config = config;
 		this.variables = {};
 	};
 
@@ -30,6 +26,11 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			}
 			this.columns = columns;
 
+			if (this.config && this.config.showCheckbox) {
+				this.columns[0].headerRenderer = HeaderRenderer;
+				this.columns[0].itemRenderer = CheckboxRenderer;
+			}
+
 			this.renderHeader();
 		},
 
@@ -37,6 +38,8 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			for (var i = 0; i < data.length; i++) {
 				this.insertRow(data[i]);
 			}
+
+			this.renderHeader();
 
 			var event = {
 				type: "loadCompleted",
@@ -116,6 +119,10 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			return this.variables[key];
 		},
 
+		refresh: function() {
+			this.renderHeader();
+		},
+
 		renderHeader: function() {
 			var columns = this.columns;
 			for (var i = 0; i < columns.length; i++) {
@@ -165,6 +172,9 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 		},
 
 		destroy: function () {
+			//todo: 要把渲染器也destroy
+
+
 			this.dom = null;
 			this.data = null;
 			this.grid = null;
@@ -215,96 +225,84 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			for (var i = 0; i < this.grid.columns.length; i++) {
 				this.render(this.dom.childNodes[i], this.data, this.grid.columns[i].field, i);
 			}
+
+			this.grid.refresh();
 		}
 	}.extend(Observer);
 
 	var CheckboxRenderer = {
 		render: function(grid, data, key, columnIndex) {
-			if (columnIndex == 0) {
-				var div = document.createElement("div");
-				var checkbox = document.createElement("input");
-				checkbox.type = "checkbox";
-				checkbox.checked = data["checked"];
+			var div = document.createElement("div");
+			var checkbox = document.createElement("input");
+			checkbox.type = "checkbox";
+			checkbox.checked = data["checked"];
 
-				checkbox.onclick = function () {
-					data["checked"] = !data["checked"];
+			checkbox.onclick = function () {
+				data["checked"] = !data["checked"];
 
-					var checkedItems = 0;
-					var rowLength = grid.rows.length;
-					for (var i=0; i<rowLength; i++) {
-						if (grid.rows[i].get("checked")) {
-							checkedItems++;
-						}
+				var checkedItems = 0;
+				var rowLength = grid.rows.length;
+				for (var i=0; i<rowLength; i++) {
+					if (grid.rows[i].get("checked")) {
+						checkedItems++;
 					}
+				}
 
-					if (checkedItems === 0) {
-						grid.set("checkState", "unchecked");
-					}
-					else if (checkedItems === rowLength) {
-						grid.set("checkState", "checked");
-					}
-					else {
-						grid.set("checkState", "indeterminate");
-					}
-				};
-				div.appendChild(checkbox);
+				if (checkedItems === 0) {
+					grid.set("checkState", "unchecked");
+				}
+				else if (checkedItems === rowLength) {
+					grid.set("checkState", "checked");
+				}
+				else {
+					grid.set("checkState", "indeterminate");
+				}
+			};
+			div.appendChild(checkbox);
 
-				var span = document.createElement("span");
-				span.innerHTML = data[key];
-				div.appendChild(span);
+			var span = document.createElement("span");
+			span.innerHTML = data[key];
+			div.appendChild(span);
 
-				return div;
-			}
-			else {
-				var span = document.createElement("span");
-				span.innerHTML = data[key];
-				return span;
-			}
+			return div;
 		}
 	};
 
 	var HeaderRenderer = {
 		render: function (grid, field, columnIndex) {
 			var rows = grid.rows;
-			if (columnIndex == 0) {
-				var div = document.createElement("div");
-				var checkbox = document.createElement("input");
-				checkbox.type = "checkbox";
+			var div = document.createElement("div");
+			var checkbox = document.createElement("input");
+			checkbox.type = "checkbox";
 
-				switch (grid.get("checkState")) {
-					case "checked": {
-						checkbox.checked = true;
-						break;
-					}
-					case "unchecked": {
-						checkbox.checked = false;
-						break;
-					}
-					case "indeterminate": {
-						checkbox.indeterminate = true;
-						break;
-					}
+			switch (grid.get("checkState")) {
+				case "checked": {
+					checkbox.checked = true;
+					break;
 				}
-				div.appendChild(checkbox);
-
-				checkbox.onclick = function () {
-					var checked = this.checked;
-					for (var i = 0; i < rows.length; i++) {
-						rows[i].set("checked", checked);
-					}
-				};
-
-				var span = document.createElement("span");
-				span.innerHTML = field;
-				div.appendChild(span);
-
-				return div;
+				case "unchecked": {
+					checkbox.checked = false;
+					break;
+				}
+				case "indeterminate": {
+					checkbox.indeterminate = true;
+					break;
+				}
 			}
-			else {
-				var span = document.createElement("span");
-				span.innerHTML = field;
-				return span;
-			}
+			div.appendChild(checkbox);
+
+			checkbox.onclick = function () {
+				var checked = this.checked;
+				for (var i = 0; i < rows.length; i++) {
+					rows[i].set("checked", checked);
+				}
+			};
+
+			var span = document.createElement("span");
+			span.innerHTML = field;
+			div.appendChild(span);
+
+			return div;
 		},
 
 		destroy: function() {
