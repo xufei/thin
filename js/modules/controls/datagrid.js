@@ -21,8 +21,10 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			}
 			var tr = this.header.insertRow(0);
 
+			var width = 100 / columns.length;
 			for (var i = 0; i < columns.length; i++) {
 				var th = tr.insertCell(i);
+				th.width = width + "%";
 			}
 			this.columns = columns;
 
@@ -225,8 +227,6 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			for (var i = 0; i < this.grid.columns.length; i++) {
 				this.render(this.dom.childNodes[i], this.data, this.grid.columns[i].field, i);
 			}
-
-			this.grid.refresh();
 		}
 	}.extend(Observer);
 

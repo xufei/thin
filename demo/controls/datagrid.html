@@ -150,7 +150,7 @@
 						totalAge += (grid.rows[i].get("age") - 0);
 					}
 
-					span.innerHTML = "--totalAge:" + totalAge;
+					span.innerHTML = " --average: " + totalAge / grid.rows.length;
 					div.appendChild(span);
 					return div;
 				}
@@ -232,6 +232,7 @@
 		}
 		else if (state === "Modify") {
 			grid.selectedRow.refresh(data);
+			grid.refresh();
 		}
 		state = "View";
 		switchButtons("Operate");
