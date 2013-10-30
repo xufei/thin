@@ -134,20 +134,25 @@
 		}, {
 			label: "Age",
 			field: "age",
-			itemRenderer: function(data, key, columnIndex) {
-				if (data[key] >= 18) {
-					var btn = document.createElement("button");
-					btn.innerHTML = data[key];
-					btn.onclick = function() {
-						alert("I am " + data[key] + " years old, I want a bottle of wine!");
-					};
+			itemRenderer: {
+				render: function(grid, data, key, columnIndex) {
+					if (data[key] >= 18) {
+						var btn = document.createElement("button");
+						btn.innerHTML = data[key];
+						btn.onclick = function() {
+							alert("I am " + data[key] + " years old, I want a bottle of wine!");
+						};
 
-					return btn;
-				}
-				else {
-					var span = document.createElement("span");
-					span.innerHTML = data[key];
-					return span;
+						return btn;
+					}
+					else {
+						var span = document.createElement("span");
+						span.innerHTML = data[key];
+						return span;
+					}
+				},
+				destroy: function() {
+
 				}
 			}
 		}];

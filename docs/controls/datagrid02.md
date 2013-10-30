@@ -76,25 +76,63 @@
 
 既然返回字符串不好，那我们直接一点，返回DOM结构如何？
 
-	function itemRenderer(data, key, columnIndex) {
-		if (data[key] >= 18) {
-			var btn = document.createElement("button");
-			btn.innerHTML = data[key];
-			btn.onclick = function() {
-				alert("I am " + data[key] + " years old, I want a bottle of wine!");
-			};
+	var itemRenderer = {
+		render: function(data, key, columnIndex) {
+			if (data[key] >= 18) {
+				var btn = document.createElement("button");
+				btn.innerHTML = data[key];
+				btn.onclick = function() {
+					alert("I am " + data[key] + " years old, I want a bottle of wine!");
+				};
 
-			return btn;
+				return btn;
+			}
+			else {
+				var span = document.createElement("span");
+				span.innerHTML = data[key];
+				return span;
+			}
+		},
+
+		destroy: function() {
+		}
+	};
+
+这样就好多了。这个时候，我们需要考虑渲染器和格式化函数的优先级，有人会问，有了渲染器，还要格式化函数干什么？这问题其实就像有了拖拉机，为什么锄头还能卖得出去？我们把渲染器当作一个比较重量级的解决方案，格式化函数当作轻量级的，各有其使用场景。
+
+我们来看看行的渲染方法应当怎么写：
+
+	render: function (cell, data, field, index) {
+		if (this.grid.columns[index].itemRenderer) {
+			cell.innerHTML = "";
+			cell.appendChild(this.grid.columns[index].itemRenderer.render(data, field, index));
+		}
+		else if (this.grid.columns[index].labelFunction) {
+			cell.innerHTML = "";
+			cell.innerHTML = this.grid.columns[index].labelFunction(data, field);
+		}
+		else if (this.grid.itemRenderer) {
+			cell.innerHTML = "";
+			cell.appendChild(this.grid.itemRenderer.render(data, field, index));
 		}
 		else {
-			var span = document.createElement("span");
-			span.innerHTML = data[key];
-			return span;
+			cell.innerHTML = data[field];
 		}
 	}
 
-这样就好多了。
+这里面有四种东西：
+- 针对某列的渲染器
+- 针对某列的格式化函数
+- 针对所有单元格的全局渲染器
+- 直接赋值
 
-现在我们实现了单元格的渲染器机制，那么，标题的列头呢？这里可能也会需要有定制的内容，那我们为它设计类似的扩展机制。
+我们让它们的优先级递减。为什么会同时需要全局渲染器和列的渲染器呢？其实也可以在全局渲染器里面对行、列作判断，然后分别为每种情况渲染，但如果很多列都需要渲染，这么做不太好，需要分离成多个不同的列渲染器。
 
-##5.3 列头渲染器
+注意到我们使用的渲染器里面带有destroy方法，这个是为了减少内存泄露而设计的，使用者可以自行在这里卸载事件处理函数，隔断待回收的对象引用。
+
+现在我们实现了单元格的渲染器机制，那么，标题的列头呢？这里可能也会需要有定制的内容，所以也需要为它设计类似的扩展机制。
+
+##5.3 数据表格的复选功能
+
+有了这些渲染器机制，我们可以来为数据表格添加更实用的功能。很多数据表格的使用场景需要复选，标题上有一个复选框，可以控制行的选中状态，行的选中状态也会反过来影响到标题复选框的选中状态。
+

@@ -11,10 +11,12 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 		this.selectedRow = null;
 
 		if (config && config.showCheckbox) {
-			this.itemRenderer = CheckboxRenderer;
 			this.headerRenderer = HeaderRenderer;
+			this.itemRenderer = CheckboxRenderer;
 		}
-	}
+
+		this.variables = {};
+	};
 
 	DataGrid.prototype = {
 		loadColumns: function (columns) {
@@ -25,18 +27,10 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 
 			for (var i = 0; i < columns.length; i++) {
 				var th = tr.insertCell(i);
-
-				if (columns[i].headerRenderer) {
-					th.appendChild(columns[i].headerRenderer(columns[i].field, i));
-				}
-				else if (this.headerRenderer) {
-					th.appendChild(this.headerRenderer(columns[i].field, i));
-				}
-				else {
-					th.innerHTML = columns[i].label;
-				}
 			}
 			this.columns = columns;
+
+			this.renderHeader();
 		},
 
 		loadData: function (data) {
@@ -111,6 +105,34 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			this.selectedRow = row;
 
 			this.fire(event);
+		},
+
+		set: function(key, value) {
+			this.variables[key] = value;
+			this.renderHeader();
+		},
+
+		get: function(key) {
+			return this.variables[key];
+		},
+
+		renderHeader: function() {
+			var columns = this.columns;
+			for (var i = 0; i < columns.length; i++) {
+				var th = this.header.firstChild.childNodes[i];
+
+				if (columns[i].headerRenderer) {
+					th.innerHTML = "";
+					th.appendChild(columns[i].headerRenderer.render(this, columns[i].field, i));
+				}
+				else if (this.headerRenderer) {
+					th.innerHTML = "";
+					th.appendChild(this.headerRenderer.render(this, columns[i].field, i));
+				}
+				else {
+					th.innerHTML = columns[i].label;
+				}
+			}
 		}
 	}.extend(Observer);
 
@@ -160,22 +182,17 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 		set: function (key, value) {
 			this.data[key] = value;
 
-			for (var i = 0; i < this.grid.columns.length; i++) {
-				if (this.grid.columns[i].field === key) {
-					this.dom.childNodes[i].innerHTML = value;
-					break;
-				}
-			}
+			this.refresh();
 		},
 
 		get: function (key) {
 			return this.data[key];
 		},
 
-		render: function(cell, data, field, index) {
+		render: function (cell, data, field, index) {
 			if (this.grid.columns[index].itemRenderer) {
 				cell.innerHTML = "";
-				cell.appendChild(this.grid.columns[index].itemRenderer(data, field, index));
+				cell.appendChild(this.grid.columns[index].itemRenderer.render(this.grid, data, field, index));
 			}
 			else if (this.grid.columns[index].labelFunction) {
 				cell.innerHTML = "";
@@ -183,7 +200,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			}
 			else if (this.grid.itemRenderer) {
 				cell.innerHTML = "";
-				cell.appendChild(this.grid.itemRenderer(data, field, index));
+				cell.appendChild(this.grid.itemRenderer.render(this.grid, data, field, index));
 			}
 			else {
 				cell.innerHTML = data[field];
@@ -191,62 +208,109 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 		},
 
 		refresh: function (data) {
-			this.data = data;
+			if (data) {
+				this.data = data;
+			}
 
 			for (var i = 0; i < this.grid.columns.length; i++) {
-				this.render(this.dom.childNodes[i], data, this.grid.columns[i].field, i);
+				this.render(this.dom.childNodes[i], this.data, this.grid.columns[i].field, i);
 			}
 		}
 	}.extend(Observer);
 
-	function CheckboxRenderer(data, key, columnIndex) {
-		if (columnIndex == 0) {
-			var div = document.createElement("div");
-			var checkbox = document.createElement("input");
-			checkbox.type = "checkbox";
-			checkbox.checked = data["checked"];
+	var CheckboxRenderer = {
+		render: function(grid, data, key, columnIndex) {
+			if (columnIndex == 0) {
+				var div = document.createElement("div");
+				var checkbox = document.createElement("input");
+				checkbox.type = "checkbox";
+				checkbox.checked = data["checked"];
 
-			checkbox.onclick = function() {
-				data["checked"] = !data["checked"];
-			};
-			div.appendChild(checkbox);
+				checkbox.onclick = function () {
+					data["checked"] = !data["checked"];
 
-			var span = document.createElement("span");
-			span.innerHTML = data[key];
-			div.appendChild(span);
+					var checkedItems = 0;
+					var rowLength = grid.rows.length;
+					for (var i=0; i<rowLength; i++) {
+						if (grid.rows[i].get("checked")) {
+							checkedItems++;
+						}
+					}
 
-			return div;
+					if (checkedItems === 0) {
+						grid.set("checkState", "unchecked");
+					}
+					else if (checkedItems === rowLength) {
+						grid.set("checkState", "checked");
+					}
+					else {
+						grid.set("checkState", "indeterminate");
+					}
+				};
+				div.appendChild(checkbox);
+
+				var span = document.createElement("span");
+				span.innerHTML = data[key];
+				div.appendChild(span);
+
+				return div;
+			}
+			else {
+				var span = document.createElement("span");
+				span.innerHTML = data[key];
+				return span;
+			}
 		}
-		else {
-			var span = document.createElement("span");
-			span.innerHTML = data[key];
-			return span;
+	};
+
+	var HeaderRenderer = {
+		render: function (grid, field, columnIndex) {
+			var rows = grid.rows;
+			if (columnIndex == 0) {
+				var div = document.createElement("div");
+				var checkbox = document.createElement("input");
+				checkbox.type = "checkbox";
+
+				switch (grid.get("checkState")) {
+					case "checked": {
+						checkbox.checked = true;
+						break;
+					}
+					case "unchecked": {
+						checkbox.checked = false;
+						break;
+					}
+					case "indeterminate": {
+						checkbox.indeterminate = true;
+						break;
+					}
+				}
+				div.appendChild(checkbox);
+
+				checkbox.onclick = function () {
+					var checked = this.checked;
+					for (var i = 0; i < rows.length; i++) {
+						rows[i].set("checked", checked);
+					}
+				};
+
+				var span = document.createElement("span");
+				span.innerHTML = field;
+				div.appendChild(span);
+
+				return div;
+			}
+			else {
+				var span = document.createElement("span");
+				span.innerHTML = field;
+				return span;
+			}
+		},
+
+		destroy: function() {
+
 		}
-	}
-
-	function HeaderRenderer(field, columnIndex) {
-		if (columnIndex == 0) {
-			var div = document.createElement("div");
-			var checkbox = document.createElement("input");
-			checkbox.type = "checkbox";
-			div.appendChild(checkbox);
-
-			checkbox.onclick = function() {
-
-			};
-
-			var span = document.createElement("span");
-			span.innerHTML = field;
-			div.appendChild(span);
-
-			return div;
-		}
-		else {
-			var span = document.createElement("span");
-			span.innerHTML = field;
-			return span;
-		}
-	}
+	};
 
 	return DataGrid;
 });
