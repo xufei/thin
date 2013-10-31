@@ -150,13 +150,15 @@
 						totalAge += (grid.rows[i].get("age") - 0);
 					}
 
-					span.innerHTML = " --average: " + totalAge / grid.rows.length;
+					span.innerHTML = " --average: " + Math.round(totalAge / grid.rows.length);
 					div.appendChild(span);
 					return div;
 				}
 			},
 			itemRenderer: {
-				render: function(grid, data, key, columnIndex) {
+				render: function(row, key, columnIndex) {
+					var data = row.data;
+
 					if (data[key] >= 18) {
 						var btn = document.createElement("button");
 						btn.innerHTML = data[key];
@@ -174,6 +176,20 @@
 				},
 				destroy: function() {
 
+				}
+			}
+		}, {
+			label: "",
+			field: "",
+			itemRenderer: {
+				render: function(row, key, columnIndex) {
+					var btn = document.createElement("button");
+					btn.innerHTML = "Grow up";
+					btn.onclick = function() {
+						row.set("age", row.get("age")+1);
+						row.grid.refresh();
+					};
+					return btn;
 				}
 			}
 		}];

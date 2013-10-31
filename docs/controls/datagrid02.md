@@ -130,9 +130,107 @@
 
 注意到我们使用的渲染器里面带有destroy方法，这个是为了减少内存泄露而设计的，使用者可以自行在这里卸载事件处理函数，隔断待回收的对象引用。
 
-现在我们实现了单元格的渲染器机制，那么，标题的列头呢？这里可能也会需要有定制的内容，所以也需要为它设计类似的扩展机制。
+现在我们实现了单元格的渲染器机制，那么，标题的列头呢？这里可能也会需要有定制的内容，所以也需要为它设计类似的扩展机制，在此不再赘述。
 
 ##5.3 数据表格的复选功能
 
 有了这些渲染器机制，我们可以来为数据表格添加更实用的功能。很多数据表格的使用场景需要复选，标题上有一个复选框，可以控制行的选中状态，行的选中状态也会反过来影响到标题复选框的选中状态。
 
+所以，我们需要两个渲染器，一个是放在标题上的，一个是放在行上的。
+
+	var CheckboxRenderer = {
+		render: function(row, field, columnIndex) {
+			var grid = row.grid;
+			var data = row.data;
+
+			var div = document.createElement("div");
+			var checkbox = document.createElement("input");
+			checkbox.type = "checkbox";
+			checkbox.checked = data["checked"];
+
+			checkbox.onclick = function () {
+				data["checked"] = !data["checked"];
+
+				var checkedItems = 0;
+				var rowLength = grid.rows.length;
+				for (var i=0; i<rowLength; i++) {
+					if (grid.rows[i].get("checked")) {
+						checkedItems++;
+					}
+				}
+
+				if (checkedItems === 0) {
+					grid.set("checkState", "unchecked");
+				}
+				else if (checkedItems === rowLength) {
+					grid.set("checkState", "checked");
+				}
+				else {
+					grid.set("checkState", "indeterminate");
+				}
+			};
+			div.appendChild(checkbox);
+
+			var span = document.createElement("span");
+			span.innerHTML = data[field];
+			div.appendChild(span);
+
+			return div;
+		}
+	};
+
+	var HeaderRenderer = {
+		render: function (grid, field, columnIndex) {
+			var rows = grid.rows;
+			var div = document.createElement("div");
+			var checkbox = document.createElement("input");
+			checkbox.type = "checkbox";
+
+			switch (grid.get("checkState")) {
+				case "checked": {
+					checkbox.checked = true;
+					break;
+				}
+				case "unchecked": {
+					checkbox.checked = false;
+					break;
+				}
+				case "indeterminate": {
+					checkbox.indeterminate = true;
+					break;
+				}
+			}
+			div.appendChild(checkbox);
+
+			checkbox.onclick = function () {
+				var checked = this.checked;
+				for (var i = 0; i < rows.length; i++) {
+					rows[i].set("checked", checked);
+				}
+			};
+
+			var span = document.createElement("span");
+			span.innerHTML = field;
+			div.appendChild(span);
+
+			return div;
+		},
+
+		destroy: function() {
+
+		}
+	};
+
+之前，我们并不能完全确定应当传递给渲染器哪些参数，可能会认为只需要当前数据和列的key值即可，在做这个例子的过程中，会发现可能还需要datagrid本身的实例，所以，直接把行的实例传入即可，从它身上可以直接获得datagrid的实例和行的数据。除此之外，列序号也可以传递进来，虽然说它跟key可以互相反查得到，但直接传入会比较便利些。
+
+##5.4 小结
+
+到目前为止，我们的数据表格控件里可以展示一些复杂的东西了，比如说一些操作按钮，图片，甚至绘制一些图形，更重要的是，它们可以跟控件本身产生交互，而又不需要修改控件自身的代码。
+
+所以说，这个DataGrid控件还是比较灵活的，可以支持有一定复杂度的需求了，但是还是有缺陷。这种机制，如果想要渲染出跨行或者跨列的表格，就有一些难度了，我们不在这个方面多作文章，只针对90%的需求编写代码。
+
+本节提到的代码，示例在：
+
+http://xufei.github.io/thin/demo/controls/datagrid.html
+
+请读者自行查看。

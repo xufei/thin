@@ -204,7 +204,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 		render: function (cell, data, field, index) {
 			if (this.grid.columns[index].itemRenderer) {
 				cell.innerHTML = "";
-				cell.appendChild(this.grid.columns[index].itemRenderer.render(this.grid, data, field, index));
+				cell.appendChild(this.grid.columns[index].itemRenderer.render(this, field, index));
 			}
 			else if (this.grid.columns[index].labelFunction) {
 				cell.innerHTML = "";
@@ -212,7 +212,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			}
 			else if (this.grid.itemRenderer) {
 				cell.innerHTML = "";
-				cell.appendChild(this.grid.itemRenderer.render(this.grid, data, field, index));
+				cell.appendChild(this.grid.itemRenderer.render(this, field, index));
 			}
 			else {
 				cell.innerHTML = data[field];
@@ -231,7 +231,10 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 	}.extend(Observer);
 
 	var CheckboxRenderer = {
-		render: function(grid, data, key, columnIndex) {
+		render: function(row, field, columnIndex) {
+			var grid = row.grid;
+			var data = row.data;
+
 			var div = document.createElement("div");
 			var checkbox = document.createElement("input");
 			checkbox.type = "checkbox";
@@ -261,7 +264,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			div.appendChild(checkbox);
 
 			var span = document.createElement("span");
-			span.innerHTML = data[key];
+			span.innerHTML = data[field];
 			div.appendChild(span);
 
 			return div;
