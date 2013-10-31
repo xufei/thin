@@ -112,20 +112,20 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			this.fire(event);
 		},
 
-		set: function(key, value) {
+		set: function (key, value) {
 			this.variables[key] = value;
 			this.renderHeader();
 		},
 
-		get: function(key) {
+		get: function (key) {
 			return this.variables[key];
 		},
 
-		refresh: function() {
+		refresh: function () {
 			this.renderHeader();
 		},
 
-		renderHeader: function() {
+		renderHeader: function () {
 			var columns = this.columns;
 			for (var i = 0; i < columns.length; i++) {
 				var th = this.header.firstChild.childNodes[i];
@@ -231,7 +231,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 	}.extend(Observer);
 
 	var CheckboxRenderer = {
-		render: function(row, field, columnIndex) {
+		render: function (row, field, columnIndex) {
 			var grid = row.grid;
 			var data = row.data;
 
@@ -245,7 +245,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 
 				var checkedItems = 0;
 				var rowLength = grid.rows.length;
-				for (var i=0; i<rowLength; i++) {
+				for (var i = 0; i < rowLength; i++) {
 					if (grid.rows[i].get("checked")) {
 						checkedItems++;
 					}
@@ -279,15 +279,18 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			checkbox.type = "checkbox";
 
 			switch (grid.get("checkState")) {
-				case "checked": {
+				case "checked":
+				{
 					checkbox.checked = true;
 					break;
 				}
-				case "unchecked": {
+				case "unchecked":
+				{
 					checkbox.checked = false;
 					break;
 				}
-				case "indeterminate": {
+				case "indeterminate":
+				{
 					checkbox.indeterminate = true;
 					break;
 				}
@@ -308,7 +311,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 			return div;
 		},
 
-		destroy: function() {
+		destroy: function () {
 
 		}
 	};

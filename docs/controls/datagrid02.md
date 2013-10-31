@@ -77,11 +77,13 @@
 既然返回字符串不好，那我们直接一点，返回DOM结构如何？
 
 	var itemRenderer = {
-		render: function(data, key, columnIndex) {
+		render: function (row, key, columnIndex) {
+			var data = row.data;
+
 			if (data[key] >= 18) {
 				var btn = document.createElement("button");
 				btn.innerHTML = data[key];
-				btn.onclick = function() {
+				btn.onclick = function () {
 					alert("I am " + data[key] + " years old, I want a bottle of wine!");
 				};
 
@@ -93,8 +95,8 @@
 				return span;
 			}
 		},
+		destroy: function () {
 
-		destroy: function() {
 		}
 	};
 
@@ -105,7 +107,7 @@
 	render: function (cell, data, field, index) {
 		if (this.grid.columns[index].itemRenderer) {
 			cell.innerHTML = "";
-			cell.appendChild(this.grid.columns[index].itemRenderer.render(data, field, index));
+			cell.appendChild(this.grid.columns[index].itemRenderer.render(this, field, index));
 		}
 		else if (this.grid.columns[index].labelFunction) {
 			cell.innerHTML = "";
@@ -113,7 +115,7 @@
 		}
 		else if (this.grid.itemRenderer) {
 			cell.innerHTML = "";
-			cell.appendChild(this.grid.itemRenderer.render(data, field, index));
+			cell.appendChild(this.grid.itemRenderer.render(this, field, index));
 		}
 		else {
 			cell.innerHTML = data[field];
