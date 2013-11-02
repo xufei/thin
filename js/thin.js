@@ -1,4 +1,4 @@
-(function (doc) {
+(function (win, doc) {
 	var moduleMap = {};
 	var fileMap = {};
 	var readyFunctions = [];
@@ -18,12 +18,12 @@
 	var thin = function () {
 	};
 
-	var addListener = document.addEventListener || document.attachEvent,
-		removeListener = document.removeEventListener || document.detachEvent;
+	var addListener = doc.addEventListener || doc.attachEvent,
+		removeListener = doc.removeEventListener || doc.detachEvent;
 
-	var eventName = document.addEventListener ? "DOMContentLoaded" : "onreadystatechange";
+	var eventName = doc.addEventListener ? "DOMContentLoaded" : "onreadystatechange";
 
-	addListener.call(document, eventName, function () {
+	addListener.call(doc, eventName, function () {
 		for (var i = readyFunctions.length - 1; i >= 0; i--) {
 			if (readyFunctions[i]) {
 				for (var j = 0; j < readyFunctions[i].length; j++) {
@@ -75,7 +75,7 @@
 		}
 	};
 
-	window.thin = thin.extend({
+	win.thin = thin.extend({
 		base: "../js/modules/",
 
 		define: function (name, dependencies, factory) {
@@ -119,8 +119,8 @@
 			}
 
 			function loadFile(file) {
-				var head = document.getElementsByTagName('head')[0];
-				var script = document.createElement('script');
+				var head = doc.getElementsByTagName('head')[0];
+				var script = doc.createElement('script');
 				script.setAttribute('type', 'text/javascript');
 				script.setAttribute('src', base + file + '.js');
 				script.onload = script.onreadystatechange = function () {
@@ -199,4 +199,4 @@
 			binding.parse(doc.body);
 		});
 	});
-})(document);
+})(window, document);
