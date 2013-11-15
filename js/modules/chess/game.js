@@ -1,4 +1,4 @@
-thin.define("Chess.Game", ["Observer", "ChessColor", "ChessType", "ChessText", "ChessFactory", "ChessBoard"], function (Observer, Color, Type, Text, Factory, ChessBoard) {
+thin.define("Chess.Game", ["_", "Events", "ChessColor", "ChessType", "ChessText", "ChessFactory", "ChessBoard"], function (_, Events, Color, Type, Text, Factory, ChessBoard) {
 	//color, type, x, y
 	var chesses = [
 		[1, 7, 4, 9],
@@ -47,7 +47,7 @@ thin.define("Chess.Game", ["Observer", "ChessColor", "ChessType", "ChessText", "
 		this.generals = [];
 	}
 
-	Game.prototype = {
+	Game.prototype = _.extend({
 		init: function () {
 			var element = this.chessBoardDiv;
 
@@ -287,7 +287,7 @@ thin.define("Chess.Game", ["Observer", "ChessColor", "ChessType", "ChessText", "
 				this.moveChess(step.chess, step.from.x, step.from.y);
 			}
 		}
-	}.extend(Observer);
+	}, Events);
 
 	return Game;
 });

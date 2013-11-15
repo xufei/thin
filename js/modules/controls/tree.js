@@ -1,4 +1,4 @@
-thin.define("Tree", ["Observer"], function (Observer) {
+thin.define("Tree", ["_", "Events"], function (_, Events) {
 	var Tree = function (element) {
 		this.allNodes = [];
 		this.childNodes = [];
@@ -17,7 +17,7 @@ thin.define("Tree", ["Observer"], function (Observer) {
 		element.appendChild(this.childrenContainer);
 	};
 
-	Tree.prototype = {
+	Tree.prototype = _.extend({
 		loadTreeData: function (data, keyField) {
 			this.clear();
 
@@ -203,7 +203,7 @@ thin.define("Tree", ["Observer"], function (Observer) {
 		destroy: function () {
 
 		}
-	}.extend(Observer);
+	}, Events);
 
 	var TreeNode = function (data, parent) {
 		this.data = data;
@@ -214,7 +214,7 @@ thin.define("Tree", ["Observer"], function (Observer) {
 		this.create();
 	};
 
-	TreeNode.prototype = {
+	TreeNode.prototype = _.extend({
 		create: function () {
 			this.dom = document.createElement("li");
 			this.iconContainer = document.createElement("i");
@@ -361,7 +361,7 @@ thin.define("Tree", ["Observer"], function (Observer) {
 				this.iconContainer.className = "icon-plus";
 			}
 		}
-	}.extend(Observer);
+	}, Events);
 
 	return Tree;
 });

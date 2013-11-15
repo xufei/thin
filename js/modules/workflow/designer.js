@@ -1,4 +1,4 @@
-thin.define("WorkflowPanel", ["Observer"], function (Observer) {
+thin.define("WorkflowPanel", ["Events"], function (Events) {
 
 });
 

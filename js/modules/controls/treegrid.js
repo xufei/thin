@@ -1,4 +1,4 @@
-thin.define("TreeGrid", ["Observer"], function (Observer) {
+thin.define("TreeGrid", ["Events"], function (Events) {
 	//作为一个控件，它的容器必须传入
 	var TreeGrid = function (element) {
 		this.columns = [];
@@ -175,7 +175,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 
 			this.fire(event);
 		}
-	}.extend(Observer);
+	}.extend(Events);
 
 	var TreeNode = function (data, parent) {
 		this.data = data;
@@ -306,7 +306,7 @@ thin.define("TreeGrid", ["Observer"], function (Observer) {
 				this.dom.childNodes[i + 1].innerHTML = this.grid.itemRenderer.render(this, data, i, this.grid.columns[i].field);
 			}
 		}
-	}.extend(Observer);
+	}.extend(Events);
 
 	function TreeGridItemRenderer(grid) {
 		this.grid = grid;

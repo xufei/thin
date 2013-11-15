@@ -1,4 +1,4 @@
-thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], function (Observer, Config, ChessText, ChessColor) {
+thin.define("ChessBoard", ["_", "Events", "Config", "ChessText", "ChessColor"], function (_, Events, Config, ChessText, ChessColor) {
 	var offsetX = Config.offsetX;
 	var offsetY = Config.offsetY;
 	var gridSize = Config.gridSize;
@@ -15,7 +15,7 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
 		}
 	};
 
-	ChessBoard.prototype = {
+	ChessBoard.prototype = _.extend({
 		drawLine: function (x1, y1, x2, y2) {
 			this.paper.path("M" + (offsetX + x1 * gridSize) + "," + (offsetY + y1 * gridSize) + " L" + (offsetX + x2 * gridSize) + "," + (offsetY + y2 * gridSize));
 		},
@@ -238,7 +238,7 @@ thin.define("ChessBoard", ["Observer", "Config", "ChessText", "ChessColor"], fun
 				}
 			}
 		}
-	}.extend(Observer);
+	}, Events);
 
 	return ChessBoard;
 });

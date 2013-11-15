@@ -1,4 +1,4 @@
-thin.define("DOMBinding", [], function () {
+thin.define("DOMBinding", ["_"], function (_) {
 	var Binder = {
 		$watch: function (key, watcher) {
 			if (!this.$watchers[key]) {
@@ -95,7 +95,7 @@ thin.define("DOMBinding", [], function () {
 		thin.log("binding model: " + name);
 
 		var model = thin.use(name);
-		var instance = new model().extend(Binder);
+		var instance = _.extend(new model(), Binder);
 		instance.$watchers = {};
 
 		return instance;

@@ -33,17 +33,7 @@
 		}
 	}, false);
 
-	//简单的对象属性复制，把源对象上的属性复制到自己身上，只复制一层
-	Object.prototype.extend = function (base) {
-		for (var key in base) {
-			if (base.hasOwnProperty(key)) {
-				this[key] = base[key];
-			}
-		}
-		return this;
-	};
-
-	var Observer = {
+	var Events = {
 		on: function (eventType, handler) {
 			if (!this.eventMap) {
 				this.eventMap = {};
@@ -75,7 +65,7 @@
 		}
 	};
 
-	win.thin = thin.extend({
+	_.extend(thin, {
 		base: "../js/modules/",
 
 		define: function (name, dependencies, factory) {
@@ -180,7 +170,11 @@
 		schedule: function(func) {
 			scheduleList.push(func);
 		}
-	}).extend(Observer);
+	});
+
+	_.extend(thin, Events);
+
+	win.thin = thin;
 
 	var timer = setInterval(function(){
 		for (var i=0; i<scheduleList.length; i++) {
@@ -188,9 +182,13 @@
 		}
 	}, 50);
 
-	//Observer
-	thin.define("Observer", [], function () {
-		return Observer;
+	thin.define("_", [], function() {
+		return _;
+	});
+
+	//Events
+	thin.define("Events", [], function () {
+		return Events;
 	});
 
 	thin.on("ready", function () {

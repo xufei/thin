@@ -1,4 +1,4 @@
-thin.define("DataGrid", ["Observer"], function (Observer) {
+thin.define("DataGrid", ["_", "Events"], function (_, Events) {
 	var DataGrid = function (element, config) {
 		this.columns = [];
 		this.rows = [];
@@ -14,7 +14,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 		this.variables = {};
 	};
 
-	DataGrid.prototype = {
+	DataGrid.prototype = _.extend({
 		loadColumns: function (columns) {
 			if (this.header.rows.length > 0) {
 				this.header.removeChild(this.header.rows[0]);
@@ -143,7 +143,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 				}
 			}
 		}
-	}.extend(Observer);
+	}, Events);
 
 	var DataRow = function (data, grid) {
 		this.data = data;
@@ -152,7 +152,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 		this.create();
 	};
 
-	DataRow.prototype = {
+	DataRow.prototype = _.extend({
 		create: function () {
 			var row = document.createElement("tr");
 			for (var i = 0; i < this.grid.columns.length; i++) {
@@ -228,7 +228,7 @@ thin.define("DataGrid", ["Observer"], function (Observer) {
 				this.render(this.dom.childNodes[i], this.data, this.grid.columns[i].field, i);
 			}
 		}
-	}.extend(Observer);
+	}, Events);
 
 	var CheckboxRenderer = {
 		render: function (row, field, columnIndex) {
