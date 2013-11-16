@@ -128,6 +128,12 @@
 		var Euclid = function() {
 		};
 
+		var flowData = {
+			variables: ["a", "b"],
+			states: [],
+			transitions: []
+		};
+
 		Euclid.prototype = _.extend(new StateMachine(), {
 			init: function() {
 				this.startState.addFunction(function() {
