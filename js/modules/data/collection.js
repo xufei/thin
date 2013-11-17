@@ -1,4 +1,12 @@
-thin.define("ArrayCollection", ["_", "Events"], function (_, Events) {
+thin.define("CollectionEvent", [], function() {
+	return {
+		ADD: "add",
+		REMOVE: "remove",
+		REMOVE_ALL: "removeAll"
+	};
+});
+
+thin.define("ArrayCollection", ["_", "Events", "CollectionEvent"], function (_, Events, CollectionEvent) {
 
 
 	var ArrayCollection = function(arr) {
@@ -12,6 +20,11 @@ thin.define("ArrayCollection", ["_", "Events"], function (_, Events) {
 
 		addItem: function(item) {
 			_arr.push(item);
+
+			this.fire({
+				type: CollectionEvent.ADD,
+				item: item
+			});
 		},
 
 		addItemAt: function(item, index) {
@@ -19,7 +32,7 @@ thin.define("ArrayCollection", ["_", "Events"], function (_, Events) {
 		},
 
 		removeItem: function(item) {
-
+			
 		},
 
 		clearAll: function() {
