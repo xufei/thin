@@ -1,4 +1,4 @@
-(function (win, doc) {
+(function (win, doc, _) {
 	var moduleMap = {};
 	var fileMap = {};
 	var readyFunctions = [];
@@ -139,7 +139,7 @@
 		},
 
 		ready: function (handler, priority) {
-			priority = (priority == null) ? 1 : priority;
+			priority = (priority === null) ? 1 : priority;
 
 			if (!readyFunctions[priority]) {
 				readyFunctions[priority] = [];
@@ -197,4 +197,4 @@
 			binding.parse(doc.body);
 		});
 	});
-})(window, document);
+})(window, document, _);

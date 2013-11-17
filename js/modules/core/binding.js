@@ -36,11 +36,12 @@ thin.define("DOMBinding", ["_"], function (_) {
 			model = bindModel(element.getAttribute("vm-model"));
 		}
 
-		for (var i = 0; i < element.attributes.length; i++) {
+        var i;
+		for (i = 0; i < element.attributes.length; i++) {
 			parseAttribute(element, element.attributes[i], model);
 		}
 
-		for (var i = 0; i < element.children.length; i++) {
+		for (i = 0; i < element.children.length; i++) {
 			parseElement(element.children[i], model);
 		}
 
@@ -56,7 +57,7 @@ thin.define("DOMBinding", ["_"], function (_) {
 	}
 
 	function parseAttribute(element, attr, model) {
-		if (attr.name.indexOf("vm-") == 0) {
+		if (attr.name.indexOf("vm-") === 0) {
 			var type = attr.name.slice(3);
 
 			switch (type) {
@@ -128,7 +129,7 @@ thin.define("DOMBinding", ["_"], function (_) {
 			};
 		}
 
-		function bindSelectValue() {
+		function bindSelectValue(el, key, model) {
 			el.onchange = function () {
 				vm[key] = el.value;
 			}
@@ -203,5 +204,5 @@ thin.define("DOMBinding", ["_"], function (_) {
 
 	return {
 		parse: parseElement
-	}
+	};
 });
