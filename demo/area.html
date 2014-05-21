@@ -57,11 +57,10 @@
 	</div>
 </div>
 <script type="text/javascript">
-	thin.ready(function () {
-		thin.require(["controls/tree", "role/vm/areaViewModel"], function () {
-			var areaManage = thin.use("AreaManage");
-			areaManage.init();
-		});
+	thin.require(["controls/tree", "role/vm/areaViewModel"], function () {
+		var areaManage = thin.use("AreaManage");
+		areaManage.init();
+		thin.fire({type: "ready"});
 	});
 </script>
 </body>
