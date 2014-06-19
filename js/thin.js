@@ -3,8 +3,6 @@
 	var fileMap = {};
 	var readyFunctions = [];
 
-	var scheduleList = [];
-
 	var noop = function () {
 	};
 
@@ -158,29 +156,12 @@
 			catch (ex) {
 
 			}
-		},
-
-		nextTick: function(func) {
-			var timer = setTimeout(function(){
-				func();
-				clearTimeout(timer);
-			}, 50);
-		},
-
-		schedule: function(func) {
-			scheduleList.push(func);
 		}
 	});
 
 	_.extend(thin, Events);
 
 	win.thin = thin;
-
-	var timer = setInterval(function(){
-		for (var i=0; i<scheduleList.length; i++) {
-			scheduleList[i]();
-		}
-	}, 50);
 
 	thin.define("_", [], function() {
 		return _;

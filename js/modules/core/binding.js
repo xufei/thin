@@ -28,6 +28,8 @@ thin.define("DOMBinding", ["_"], function (_) {
 	};
 
 	var vmMap = {};
+	
+	var changeHandlers = [];
 
 	function parseElement(element, vm) {
 		var model = vm;
@@ -108,31 +110,35 @@ thin.define("DOMBinding", ["_"], function (_) {
 		vm.$watch(key, function (value, oldValue) {
 			element.value = value || "";
 		});
-
-		/*
-		 switch () {
-		 case "TextInput": {
-
-		 }
-		 }
-		 */
-		bindTextValue(element, key, vm);
+		
+		switch (element.tagName) {
+			case "SELECT": {
+				bindSelectValue(element, key, vm);
+				break;
+			}
+			default: {
+				bindTextValue(element, key, vm);
+				break;
+			}
+		}
 
 		function bindTextValue(el, key, model) {
-
 			el.onkeyup = function () {
 				model[key] = el.value;
+				thin.fire({type: "vmchange"});
 			};
 
 			el.onpaste = function () {
 				model[key] = el.value;
+				thin.fire({type: "vmchange"});
 			};
 		}
 
 		function bindSelectValue(el, key, model) {
 			el.onchange = function () {
 				vm[key] = el.value;
-			}
+				thin.fire({type: "vmchange"});
+			};
 		}
 	}
 
@@ -160,6 +166,7 @@ thin.define("DOMBinding", ["_"], function (_) {
 		vm.$initializer = (function (model) {
 			return function () {
 				model[key]();
+				thin.fire({type: "vmchange"});
 			};
 		})(vm);
 	}
@@ -169,6 +176,7 @@ thin.define("DOMBinding", ["_"], function (_) {
 
 		element.onclick = function () {
 			vm[key]();
+			thin.fire({type: "vmchange"});
 		};
 	}
 
@@ -176,7 +184,7 @@ thin.define("DOMBinding", ["_"], function (_) {
 		thin.log("binding enable: " + key);
 
 		if (typeof vm[key] == "function") {
-			thin.schedule(function() {
+			changeHandlers.push(function() {
 				element.disabled = vm[key]() ^ direction ? true : false;
 			});
 		}
@@ -191,7 +199,7 @@ thin.define("DOMBinding", ["_"], function (_) {
 		thin.log("binding visible: " + key);
 
 		if (typeof vm[key] == "function") {
-			thin.schedule(function() {
+			changeHandlers.push(function() {
 				element.style.display = vm[key]() ^ direction ? "none" : "";
 			});
 		}
@@ -201,6 +209,16 @@ thin.define("DOMBinding", ["_"], function (_) {
 			});
 		}
 	}
+	
+	function apply() {
+		for (var i=0; i<changeHandlers.length; i++) {
+			changeHandlers[i]();
+		}
+	}
+	
+	thin.on("vmchange", function() {
+		apply();
+	});
 
 	return {
 		parse: parseElement

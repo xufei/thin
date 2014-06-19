@@ -38,6 +38,7 @@ thin.define("StaffViewModel", ["DataGrid"], function (DataGrid) {
 				}
 
 				that.setFormData(data);
+				thin.fire({type: "vmchange"});
 			});
 
 			grid.on("rowInserted", function (event) {
@@ -152,6 +153,15 @@ thin.define("StaffViewModel", ["DataGrid"], function (DataGrid) {
 			this.name = data.name;
 			this.gender = data.gender;
 			this.age = data.age;
+		},
+		
+		okEnabled: function() {
+			if (this.editing && (this.name) && (this.name.length >= 5)) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 	};
 
